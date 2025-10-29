@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+* {
+  font-family:
+    'Segoe UI',
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom font utilities */
+.font-krona {
+  font-family: 'Krona One', sans-serif;
+}
+
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
