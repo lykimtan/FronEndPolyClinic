@@ -1,4 +1,5 @@
 import { publicApi } from './api.service';
+import { privateApi } from './api.service';
 
 // export const login = async credentials => {
 //   const res = await publicApi.post('/auth/login', credentials);
@@ -10,7 +11,7 @@ class AuthService {
     this.baseUrl = baseUrl;
   }
   async login(credentials) {
-    const res = await publicApi.post(`${this.baseUrl}/login`, credentials);
+    const res = await privateApi.post(`${this.baseUrl}/login`, credentials);
     return res.data;
   }
 
