@@ -115,7 +115,15 @@ const handleGoogleLogin = async idToken => {
       const user = response.data.user;
       toast.success(`Đăng nhập Google thành công! Chào mừng ${user.firstName || ''}!`);
       userStore.setUser(user);
-      router.push('/');
+
+      // Redirect based on user role
+      if (user.role === 'staff') {
+        router.push('/staff/dashboard');
+      } else if (user.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/');
+      }
     } else {
       toast.error(response?.message || 'Đăng nhập Google thất bại!');
     }
@@ -173,8 +181,14 @@ const handleSubmit = async credential => {
       // Lưu thông tin người dùng vào store
       userStore.setUser(user);
 
-      // Redirect to home
-      router.push('/');
+      // Redirect based on user role
+      if (user.role === 'staff') {
+        router.push('/staff/dashboard');
+      } else if (user.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/');
+      }
     } else {
       toast.error(response?.message || 'Đăng nhập thất bại, vui lòng kiểm tra lại thông tin.');
     }

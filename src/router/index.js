@@ -1,5 +1,6 @@
 import { createWebHistory, createRouter } from 'vue-router';
-// import { authGuard } from './authGuard';
+import { authGuard } from '../utils/authGuard';
+
 const routes = [
   {
     path: '/',
@@ -60,21 +61,30 @@ const routes = [
     component: () => import('../views/Auth/Register.vue'),
   },
 
+  {
+    path: '/forbidden',
+    name: 'Forbidden',
+    component: () => import('../views/Forbidden.vue'),
+  },
+
   //admin
   {
     path: '/admin',
     name: 'Admin',
     component: () => import('../views/Admin/AdminLayout.vue'),
+    meta: { requiresAuth: true, role: 'admin' },
     children: [
       {
         path: 'dashboard',
         name: 'AdminDashboard',
         component: () => import('../views/Admin/DashBoard.vue'), // Tải vào router-view BÊN TRONG AdminLayout
+        meta: { requiresAuth: true, role: 'admin' },
       },
       {
         path: 'role-request/:id',
         name: 'AdminRoleRequests',
         component: () => import('../views/Admin/RoleRequestDetail.vue'),
+        meta: { requiresAuth: true, role: 'admin' },
       },
     ],
   },
@@ -87,6 +97,7 @@ const routes = [
     path: '/staff',
     name: 'Staff',
     component: () => import('../views/Staff/StaffLayout.vue'),
+    meta: { requiresAuth: true, role: 'staff' },
     children: [
       {
         path: 'dashboard',
@@ -120,6 +131,17 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+// Add global navigation guard
+router.beforeEach((to, from, next) => {
+  const result = authGuard(to);
+
+  if (result === true) {
+    next();
+  } else {
+    next(result);
+  }
 });
 
 export default router;
