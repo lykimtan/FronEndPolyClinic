@@ -1,8 +1,6 @@
 import { useUserStore } from '@/stores/userStore';
 
-// Vue Router v4 guard - returns a navigation result or true to continue
 export function authGuard(to) {
-  // useUserStore requires Pinia to be installed before this runs
   const userStore = useUserStore();
   const user = userStore.user || JSON.parse(localStorage.getItem('user'));
 

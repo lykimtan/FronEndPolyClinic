@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-gradient-to-r from-gray-200 to-gray-300 rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300"
+    class="bg-gradient-to-r from-gray-200 to-gray-300 rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 mb-5"
   >
     <!-- Card Content -->
     <div class="grid grid-cols-2 h-full">
