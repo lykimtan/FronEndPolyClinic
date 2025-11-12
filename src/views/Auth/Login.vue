@@ -75,12 +75,7 @@
           <div class="text-center text-gray-500 text-sm mt-4">or login with social platforms</div>
 
           <div class="flex justify-center space-x-4 mt-2">
-            <button class="p-2 border rounded-full hover:bg-gray-100">
-              <i class="fab fa-google"></i>
-            </button>
-            <button class="p-2 border rounded-full hover:bg-gray-100">
-              <i class="fab fa-facebook-f"></i>
-            </button>
+            <div id="google-btn" class="w-full flex justify-center"></div>
           </div>
         </Form>
       </div>
@@ -111,6 +106,52 @@ const togglePassword = () => {
 };
 
 //xu ly dang nhap
+
+const handleGoogleLogin = async idToken => {
+  try {
+    const response = await authService.googleLogin({ idToken });
+
+    if (response?.success && response?.data?.user) {
+      const user = response.data.user;
+      toast.success(`Đăng nhập Google thành công! Chào mừng ${user.firstName || ''}!`);
+      userStore.setUser(user);
+      router.push('/');
+    } else {
+      toast.error(response?.message || 'Đăng nhập Google thất bại!');
+    }
+  } catch (error) {
+    console.error('Google login failed:', error);
+    toast.error(error.response?.data?.message || 'Lỗi đăng nhập Google');
+  }
+};
+
+onMounted(() => {
+  // Render nút Google
+  /* global google */
+  // Debug: print client id and origin from module context (cannot use import.meta in browser console)
+  try {
+    console.log('GSI client id (from module):', import.meta.env.VITE_GOOGLE_CLIENT_ID);
+
+    console.log('Page origin:', window.location.origin);
+  } catch (e) {
+    console.warn('Unable to read import.meta.env here', e);
+  }
+  if (window.google) {
+    google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      callback: response => {
+        const idToken = response.credential;
+        handleGoogleLogin(idToken);
+      },
+    });
+
+    google.accounts.id.renderButton(document.getElementById('google-btn'), {
+      theme: 'outline',
+      size: 'large',
+      width: 250,
+    });
+  }
+});
 
 const loginSchema = yup.object({
   email: yup.string().email('Email không hợp lệ').required('Vui lòng nhập email'),

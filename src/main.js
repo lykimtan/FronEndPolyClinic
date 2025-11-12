@@ -7,6 +7,7 @@ import 'vue-sonner/style.css'; // Import vue-sonner styles
 import './style/index.css';
 import App from './App.vue';
 import { useUserStore } from './stores/userStore';
+import { authGuard } from './utils/authGuard';
 
 const pinia = createPinia();
 const app = createApp(App);
@@ -17,5 +18,8 @@ app.use(router);
 // Restore user from localStorage after Pinia is initialized
 const userStore = useUserStore();
 userStore.loadUser();
+
+// Register router guard after Pinia and user are ready
+router.beforeEach(authGuard);
 
 app.mount('#app');

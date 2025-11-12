@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { authService } from '@/api/authService';
+import { userService } from '@/api/userService';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -38,6 +39,21 @@ export const useUserStore = defineStore('user', {
       // Clear local state and storage
       this.user = null;
       localStorage.removeItem('user');
+    },
+
+    async fetchUserProfile() {
+      try {
+        const res = await userService.getUserProfile();
+        // res is expected to be { success: true, data: { user } }
+        if (res && res.data && res.data.user) {
+          this.setUser(res.data.user);
+          return res.data.user;
+        }
+        return null;
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+        return null;
+      }
     },
   },
 

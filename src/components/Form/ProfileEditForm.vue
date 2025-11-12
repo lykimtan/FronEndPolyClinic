@@ -263,7 +263,7 @@ const initialValues = computed(() => ({
   phone: props.userInfo?.phone || '',
   address: props.userInfo?.address || '',
   dateOfBirth: props.userInfo?.dateOfBirth ? props.userInfo.dateOfBirth.split('T')[0] : '',
-  gender: props.userInfo?.gender || '',
+  gender: props.userInfo?.gender || 'male',
   allergies: props.userInfo?.allergies?.join(', ') || '',
   medicalHistory: props.userInfo?.medicalHistory?.join(', ') || '',
   emergencyContact: {

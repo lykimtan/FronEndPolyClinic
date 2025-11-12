@@ -1,7 +1,4 @@
 <template>
-  <HeaderPart />
-  <NavBar :user-info="userInfo" />
-
   <div class="min-h-screen bg-gray-50 py-8 px-4">
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
@@ -41,8 +38,6 @@ import { ref, computed, watch } from 'vue';
 import router from '@/router';
 import { useUserStore } from '@/stores/userStore';
 import { toast, Toaster } from 'vue-sonner';
-import HeaderPart from '@/components/HeaderPart.vue';
-import NavBar from '@/components/NavBar.vue';
 import ProfileEditForm from '@/components/Form/ProfileEditForm.vue';
 import { userService } from '@/api/userService';
 

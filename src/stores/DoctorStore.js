@@ -1,68 +1,9 @@
 import { defineStore } from 'pinia';
+import doctorService from '@/api/doctorService';
 
 export const useDoctorStore = defineStore('doctor', {
   state: () => ({
-    list: [
-      {
-        id: 1,
-        name: 'Dr. John Doe',
-        specialization: 'Cardiology',
-        image: 'https://i.pinimg.com/736x/85/56/99/8556991d254994e1a3ca1cf6c03ff534.jpg',
-        yearOfExperience: 10,
-        ratingAverage: 4.8,
-      },
-
-      {
-        id: 2,
-        name: 'Dr. John Doe',
-        specialization: 'Cardiology',
-        image: 'https://i.pinimg.com/736x/85/56/99/8556991d254994e1a3ca1cf6c03ff534.jpg',
-        yearOfExperience: 10,
-        ratingAverage: 4.8,
-      },
-
-      {
-        id: 3,
-        name: 'Dr. John Doe',
-        specialization: 'Cardiology',
-        image: 'https://i.pinimg.com/736x/85/56/99/8556991d254994e1a3ca1cf6c03ff534.jpg',
-        yearOfExperience: 10,
-        ratingAverage: 3.5,
-      },
-
-      {
-        id: 3,
-        name: 'Dr. John Doe',
-        specialization: 'Cardiology',
-        image: 'https://i.pinimg.com/736x/85/56/99/8556991d254994e1a3ca1cf6c03ff534.jpg',
-        yearOfExperience: 10,
-        ratingAverage: 3.5,
-      },
-      {
-        id: 3,
-        name: 'Dr. John Doe',
-        specialization: 'Cardiology',
-        image: 'https://i.pinimg.com/736x/85/56/99/8556991d254994e1a3ca1cf6c03ff534.jpg',
-        yearOfExperience: 10,
-        ratingAverage: 3.5,
-      },
-      {
-        id: 3,
-        name: 'Dr. John Doe',
-        specialization: 'Cardiology',
-        image: 'https://i.pinimg.com/736x/85/56/99/8556991d254994e1a3ca1cf6c03ff534.jpg',
-        yearOfExperience: 10,
-        ratingAverage: 3.5,
-      },
-      {
-        id: 3,
-        name: 'Dr. John Doe',
-        specialization: 'Cardiology',
-        image: 'https://i.pinimg.com/736x/85/56/99/8556991d254994e1a3ca1cf6c03ff534.jpg',
-        yearOfExperience: 10,
-        ratingAverage: 3.5,
-      },
-    ],
+    list: [],
   }),
   getters: {
     getDoctorByRating: state => {
@@ -70,5 +11,45 @@ export const useDoctorStore = defineStore('doctor', {
     },
     getAll: state => state.list,
     getById: state => id => state.list.find(d => d.id === id),
+  },
+
+  actions: {
+    async fetchDoctors() {
+      try {
+        const response = await doctorService.getAllDoctors();
+        console.log('Raw response from API:', response);
+        if (Array.isArray(response)) {
+          this.list = response;
+        } else if (response.data && Array.isArray(response.data)) {
+          this.list = response.data;
+        } else if (response.doctors && Array.isArray(response.doctors)) {
+          this.list = response.doctors;
+        } else {
+          console.error('Unexpected response structure:', response);
+          this.list = [];
+        }
+      } catch (error) {
+        console.error('Error fetching doctors:', error);
+        this.list = [];
+      }
+    },
+
+    async fetchDoctorBySpecialization(specializationId) {
+      try {
+        const doctors = await doctorService.getAllDoctorsBySpecialization(specializationId);
+        return doctors;
+      } catch (error) {
+        console.error('Error fetching doctors by specialization:', error);
+      }
+    },
+
+    async getDoctorById(doctorId) {
+      try {
+        const doctor = await doctorService.getDoctorById(doctorId);
+        return doctor;
+      } catch (error) {
+        console.error('Error fetching doctor by ID:', error);
+      }
+    },
   },
 });

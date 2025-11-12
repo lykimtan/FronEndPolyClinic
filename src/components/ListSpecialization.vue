@@ -1,13 +1,13 @@
 <script setup>
-import { ref, defineProps } from 'vue';
-import { useSpecializationStore } from '@/stores/specializationStore';
+import { ref, defineProps, defineEmits } from 'vue';
 
-const props = defineProps({
+defineProps({
   specializations: {
     type: Array,
     default: () => [],
   },
 });
+defineEmits(['goToDetail']);
 const scrollContainer = ref(null);
 
 const scrollLeft = () => {
@@ -26,6 +26,11 @@ const scrollRight = () => {
       behavior: 'smooth',
     });
   }
+};
+const getImageUrl = path => {
+  if (!path) return '/src/assets/images/specilization/DefaultSpec.jpg';
+  if (path.startsWith('http')) return path;
+  return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}${path}`;
 };
 </script>
 <template>
@@ -57,9 +62,14 @@ const scrollRight = () => {
         v-for="specialization in specializations"
         :key="specialization.id"
         class="relative group flex-shrink-0 text-center snap-center w-80"
+        @click="$emit('goToDetail', specialization.id)"
       >
         <!-- Ảnh -->
-        <img class="w-80 h-90 rounded-lg object-cover" :src="specialization.image" alt="" />
+        <img
+          class="w-80 h-90 rounded-lg object-cover"
+          :src="getImageUrl(specialization.image)"
+          alt=""
+        />
 
         <!-- Overlay -->
         <div

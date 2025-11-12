@@ -1,14 +1,30 @@
 <template>
-  <HeaderPart />
-  <NavBar :user-info="userInfo" />
   <div>
     <h1 class="text-2xl text-center p-5 font-bold">Thông tin tài khoản</h1>
     <div class="container flex-col items-center justify-center mx-auto p-5 flex">
-      <img
-        :src="getAvatarUrl(userInfo?.avatar)"
-        alt="User Avatar"
-        class="w-90 h-90 rounded-full object-cover"
-      />
+      <div class="relative">
+        <img
+          :src="getAvatarUrl(userInfo?.avatar)"
+          alt="User Avatar"
+          class="w-90 h-90 rounded-full object-cover border-20 border-blue-500 shadow-lg"
+        />
+        <i
+          v-if="userInfo?.role === 'admin'"
+          class="fa-solid fa-user-tie absolute bottom-3 left-1/2 transform -translate-x-1/2 translate-y-1/2 text-white rounded-full text-2xl shadow-lg"
+        ></i>
+        <i
+          v-if="userInfo?.role === 'staff'"
+          class="fa-solid fa-user-nurse absolute bottom-3 left-1/2 transform -translate-x-1/2 translate-y-1/2 text-white rounded-full text-2xl shadow-lg"
+        ></i>
+        <i
+          v-if="userInfo?.role === 'doctor'"
+          class="fa-solid fa-stethoscope absolute bottom-3 left-1/2 transform -translate-x-1/2 translate-y-1/2 text-white rounded-full text-2xl shadow-lg"
+        ></i>
+        <i
+          v-if="userInfo?.role === 'patient'"
+          class="fa-solid fa-bed-pulse absolute bottom-3 left-1/2 transform -translate-x-1/2 translate-y-1/2 text-white rounded-full text-2xl shadow-lg"
+        ></i>
+      </div>
       <h2 class="text-2xl font-semibold mt-4">
         {{ userInfo?.fullName || userInfo?.firstName || 'User' }}
       </h2>
@@ -50,6 +66,15 @@
       </div>
     </div>
   </div>
+  <div class="p-10">
+    <UserProfileRequestCard
+      v-if="roleRequests && roleRequests.length"
+      :role-requests="roleRequests"
+      :get-role-name="getRoleName"
+      :handle-delete="handleDelete"
+      :get-status="getStatus"
+    />
+  </div>
 
   <div class="relative">
     <div class="absolute right-5 top-5 flex gap-2 z-10">
@@ -88,16 +113,24 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
-import HeaderPart from '@/components/HeaderPart.vue';
-import NavBar from '@/components/NavBar.vue';
+import { ref, computed, watch, onMounted } from 'vue';
+import UserProfileRequestCard from '@/components/UserProfileRequestCard.vue';
 import { useUserStore } from '@/stores/userStore';
+import { useRoleRequestedStore } from '@/stores/RoleRequestedStore';
 import router from '@/router';
 import { toast } from 'vue-sonner';
 
 const userStore = useUserStore();
+const roleStore = useRoleRequestedStore();
 // Use computed to reactively get user info
 const userInfo = computed(() => userStore.getUserInfo);
+
+onMounted(async () => {
+  await roleStore.getMyRequests(); // gọi API và lưu vào state
+  console.log('Fetched role requests in UserProfile:', roleStore.roleRequests);
+});
+const roleRequests = computed(() => roleStore.roleRequests);
+
 console.log('User Info in UserProfile:', userInfo.value);
 
 // watch logged status
@@ -115,7 +148,7 @@ watch(
 // Helper to get full avatar URL
 const getAvatarUrl = avatar => {
   if (!avatar) return '/src/assets/images/avartar.jpg';
-  if (avatar.startsWith('http')) return avatar;
+  if (avatar.startsWith('http') || avatar.startsWith('https')) return avatar;
   return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}${avatar}`;
 };
 
@@ -181,6 +214,47 @@ const handleLogout = async () => {
     toast.error('Đăng xuất thất bại, vui lòng thử lại');
   }
 };
+
+// Delete handler for user's own role request
+const handleDelete = async id => {
+  if (!confirm('Bạn có chắc muốn xóa yêu cầu này?')) return;
+  try {
+    await roleStore.deleteRequest(id);
+    toast.success('Đã xóa yêu cầu thành công');
+    // Refresh the list after deletion
+    await roleStore.getMyRequests();
+  } catch (error) {
+    console.error('Delete request error:', error);
+    toast.error('Xóa yêu cầu thất bại. Vui lòng thử lại');
+  }
+};
+function getStatus(status) {
+  switch (status) {
+    case 'pending':
+      return 'Đang chờ duyệt';
+    case 'approved':
+      return 'Đã được phê duyệt';
+    case 'rejected':
+      return 'Đã bị từ chối';
+    default:
+      return 'Không xác định';
+  }
+}
+
+function getRoleName(role) {
+  switch (role) {
+    case 'admin':
+      return 'Quản trị viên';
+    case 'staff':
+      return 'Nhân viên';
+    case 'doctor':
+      return 'Bác sĩ';
+    case 'patient':
+      return 'Bệnh nhân';
+    default:
+      return 'Chưa xác định';
+  }
+}
 </script>
 
 <style scoped>

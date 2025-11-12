@@ -1,11 +1,9 @@
 <template>
-  <HeaderPart />
-  <NavBar />
-
   <Form
-    class="bg-white rounded-2xl shadow-xl p-8 space-y-6 border border-gray-100 w-[50%] mx-auto mb-20"
+    class="bg-white rounded-2xl shadow-xl p-8 space-y-6 border border-gray-100 md:w-[50%] mx-auto mb-20"
     enctype="multipart/form-data"
     :validation-schema="validationSchema"
+    :is-submitting="isSubmitting"
     @submit="handleSubmit"
   >
     <div class="max-w-5xl mx-auto mt-10 mb-20">
@@ -16,7 +14,7 @@
       <label class="block text-base font-semibold text-gray-700 mb-2">Chọn quyền</label>
       <Field
         v-model="selectedRole"
-        name="role"
+        name="requestedRole"
         as="select"
         class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all cursor-pointer hover:border-gray-400"
       >
@@ -25,7 +23,7 @@
         <option value="staff">Nhân viên y tế</option>
         <option value="admin">Quản trị viên</option>
       </Field>
-      <ErrorMessage name="role" class="text-red-500 text-sm mt-1" />
+      <ErrorMessage name="requestedRole" class="text-red-500 text-sm mt-1" />
     </div>
 
     <!-- Specializations (only show for doctor) -->
@@ -39,26 +37,13 @@
           multiple
           class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all cursor-pointer hover:border-gray-400 h-44 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
         >
-          <option class="py-2 px-2 hover:bg-gray-100 cursor-pointer" value="cardiology">
-            Tim mạch
-          </option>
-          <option class="py-2 px-2 hover:bg-gray-100 cursor-pointer" value="dermatology">
-            Da liễu
-          </option>
-          <option class="py-2 px-2 hover:bg-gray-100 cursor-pointer" value="neurology">
-            Thần kinh
-          </option>
-          <option class="py-2 px-2 hover:bg-gray-100 cursor-pointer" value="pediatrics">
-            Nhi khoa
-          </option>
-          <option class="py-2 px-2 hover:bg-gray-100 cursor-pointer" value="psychiatry">
-            Tâm thần học
-          </option>
-          <option class="py-2 px-2 hover:bg-gray-100 cursor-pointer" value="radiology">
-            Chẩn đoán hình ảnh
-          </option>
-          <option class="py-2 px-2 hover:bg-gray-100 cursor-pointer" value="surgery">
-            Phẫu thuật
+          <option
+            v-for="spec in specializations"
+            :key="spec._id || spec.id"
+            :value="spec._id || spec.id"
+            class="py-2 px-2 hover:bg-gray-100 cursor-pointer"
+          >
+            {{ spec.name }}
           </option>
         </Field>
         <ErrorMessage name="specializationIds" class="text-red-500 text-sm mt-1" />
@@ -86,11 +71,12 @@
         <span>Upload giấy phép (Ảnh)</span>
         <input type="file" class="hidden" accept="image/*" @change="handleFileChange" />
       </label>
-
-      <!-- Hiển thị tên file nếu có -->
-      <p v-if="selectedFileName" class="text-sm text-gray-600 mt-2">
-        <i class="fa-solid fa-file-image mr-1 text-sky-500"></i> {{ selectedFileName }}
-      </p>
+      <img
+        v-if="previewDocument"
+        :src="previewDocument"
+        alt="Document Preview"
+        class="w-200 object-cover border-4 border-sky-500 shadow-lg justify-center mt-4 rounded-xl"
+      />
     </div>
 
     <!-- Submit button -->
@@ -103,31 +89,117 @@
       </button>
     </div>
   </Form>
+  <Toaster position="top-right" />
 </template>
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { Form, Field, ErrorMessage } from 'vee-validate';
+import router from '@/router';
 import * as yup from 'yup';
-import { toast } from 'vue-sonner';
-import NavBar from '@/components/NavBar.vue';
-import HeaderPart from '@/components/HeaderPart.vue';
+import { toast, Toaster } from 'vue-sonner';
+import { useUserStore } from '@/stores/userStore';
+import roleRequestService from '@/api/roleRequestService';
+import { useSpecializationStore } from '@/stores/specializationStore';
+
+const userStore = useUserStore();
+const userInfo = computed(() => userStore.getUserInfo);
+const storeSpecialization = useSpecializationStore();
+
+const specializations = computed(() => storeSpecialization.getAll);
 
 const selectedRole = ref('');
+const isSubmitting = ref(false);
+const selectedFile = ref(null);
+const previewDocument = ref(null);
 
+onMounted(async () => {
+  // fetch and populate specializations into the store when HomeView mounts
+  await storeSpecialization.fetchSpecializations();
+  console.log('Specializations fetched in RoleRequest view: ', storeSpecialization.getAll);
+});
+
+// Use lowercase `requestedRole` to match the Field name in the template
 const validationSchema = yup.object({
-  role: yup.string().required('Vui lòng chọn quyền yêu cầu'),
-  specializationIds: yup.array().when('role', {
-    is: 'doctor',
-    then: yup
-      .array()
-      .min(1, 'Vui lòng chọn ít nhất một chuyên khoa')
-      .required('Vui lòng chọn chuyên khoa'),
-    otherwise: yup.array().notRequired(),
+  requestedRole: yup.string().required('Vui lòng chọn quyền yêu cầu'),
+  specializationIds: yup.array().when('requestedRole', {
+    is: val => val === 'doctor',
+    then: () => yup.array().min(1, 'Vui lòng chọn ít nhất một chuyên khoa').required(),
+    otherwise: () => yup.array().notRequired(),
   }),
-  licenseNumber: yup.string().when('role', {
+  licenseNumber: yup.string().when('requestedRole', {
     is: 'doctor',
-    then: yup.string().required('Vui lòng nhập số giấy phép hành nghề'),
-    otherwise: yup.string().notRequired(),
+    then: () => yup.string().required('Vui lòng nhập số giấy phép'),
+    otherwise: () => yup.string().notRequired(),
   }),
 });
+
+const handleFileChange = event => {
+  const file = event.target.files[0];
+  if (file) {
+    selectedFile.value = file;
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewDocument.value = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const handleSubmit = async values => {
+  console.log('Form Values: ', values);
+  try {
+    isSubmitting.value = true;
+
+    // prepare documentUrl in outer scope so it's always defined
+    let documentUrl = null;
+
+    if (selectedFile.value) {
+      try {
+        const uploadResponse = await roleRequestService.uploadDocument(selectedFile.value);
+        // support multiple possible response shapes
+        const fileUrl =
+          uploadResponse?.data?.documentUrl || uploadResponse?.documentUrl || uploadResponse?.data;
+        if (fileUrl) {
+          documentUrl = fileUrl;
+          toast.success('Uploaded proof document successfully');
+        } else if (uploadResponse?.success === false) {
+          throw new Error(uploadResponse?.message || 'Upload failed');
+        } else {
+          // no explicit url returned — just warn
+          console.warn('Upload response missing file url:', uploadResponse);
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast.error('Failed to upload proof document');
+        // continue — you may choose to return here to abort submission
+      }
+    }
+
+    const valuesToSubmit = {
+      ...values,
+      documentProof: documentUrl || null,
+      // include current user's id so backend knows who requested the role
+      userId: userInfo?.value?.id ?? null,
+    };
+    console.log('uploaded Data: ', valuesToSubmit);
+
+    // call Api to submit role request
+    const response = await roleRequestService.submitRoleRequest(valuesToSubmit);
+    // accept response shapes that either include a success flag or not
+    if (response?.success === false) {
+      throw new Error(response?.message || 'Submit failed');
+    }
+
+    toast.success('Yêu cầu nâng cấp quyền đã được gửi thành công!');
+    // reset form state
+    setTimeout(() => {
+      router.push('/userProfile');
+    }, 1000);
+  } catch (err) {
+    console.error('Submit error:', err);
+    toast.error(err?.message || 'Gửi yêu cầu nâng cấp quyền thất bại. Vui lòng thử lại.');
+  } finally {
+    isSubmitting.value = false;
+  }
+};
 </script>

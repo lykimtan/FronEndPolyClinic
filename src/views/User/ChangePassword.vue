@@ -1,6 +1,4 @@
 <template>
-  <HeaderPart />
-  <NavBar :user-info="userInfo" />
   <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-2xl mx-auto">
       <!-- Header -->
@@ -190,8 +188,6 @@ import * as yup from 'yup';
 import { toast, Toaster } from 'vue-sonner';
 import { useUserStore } from '@/stores/userStore';
 import { userService } from '@/api/userService';
-import HeaderPart from '@/components/HeaderPart.vue';
-import NavBar from '@/components/NavBar.vue';
 
 const router = useRouter();
 const userStore = useUserStore();

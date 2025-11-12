@@ -15,6 +15,11 @@ class AuthService {
     return res.data;
   }
 
+  async googleLogin(data) {
+    const res = await privateApi.post('/api/auth/google', data);
+    return res.data;
+  }
+
   async register(userData) {
     const res = await publicApi.post(`${this.baseUrl}/register`, userData);
     return res.data;
