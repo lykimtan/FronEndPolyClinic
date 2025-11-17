@@ -103,18 +103,6 @@ const getImageUrl = path => {
 const isLoaded = ref(false);
 const doc = ref({});
 
-const doctor = {
-  name: 'Ly Van Sol',
-  fullName: 'Lý Văn Sol',
-  dob: '20/10/1989',
-  specialization: 'Tim mạch',
-  experience: 20,
-  education: 'Tốt nghiệp trường Đại học Y Hà Nội',
-  totalExams: 50,
-  rating: 4.8,
-  image: 'https://i.pinimg.com/1200x/2a/cb/ab/2acbab619d2094753c4483c521d43344.jpg', // ảnh mẫu
-};
-
 onMounted(async () => {
   const doctorId = route.params.id;
   const docRes = await doctorStore.getDoctorById(doctorId);

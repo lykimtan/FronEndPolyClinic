@@ -223,6 +223,7 @@ const emit = defineEmits(['close', 'success']);
 const recurringStore = useRecurringStore();
 
 const isEditMode = computed(() => !!props.recurringData?.data?._id);
+// hai dấu chấm than có nghĩa là ép kiểu biến sau nó thành boolean
 
 const formData = reactive({
   dayOfWeek: 0,
@@ -292,7 +293,6 @@ const handleSubmit = async () => {
       successMessage.value = 'Tạo lịch định kỳ thành công!';
     }
 
-    // Wait a bit to show success message
     setTimeout(() => {
       emit('success');
       emit('close');

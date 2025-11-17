@@ -158,7 +158,6 @@ const handleCreate = () => {
 };
 
 const handleFormSuccess = async () => {
-  // Refresh recurring schedule data after create/update
   try {
     const data = await recurringStore.fetchRecurringByDoctorId(props.doctor._id);
     recurring.value = data;

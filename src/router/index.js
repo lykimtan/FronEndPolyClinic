@@ -46,6 +46,11 @@ const routes = [
         name: 'DoctorProfile',
         component: () => import('../views/Detail/DoctorProfileDetail.vue'),
       },
+      {
+        path: '/appointment/create',
+        name: 'CreateAppointment',
+        component: () => import('../views/CreateAppointment.vue'),
+      },
     ],
   },
 
@@ -85,6 +90,28 @@ const routes = [
         name: 'AdminRoleRequests',
         component: () => import('../views/Admin/RoleRequestDetail.vue'),
         meta: { requiresAuth: true, role: 'admin' },
+      },
+    ],
+  },
+
+  //doctor
+  {
+    path: '/doctor',
+    name: 'Doctor',
+    component: () => import('../views/Doctor/DoctorLayout.vue'),
+    meta: { requiresAuth: true, role: 'doctor' },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'DoctorDashboard',
+        component: () => import('../views/Doctor/DoctorDashboard.vue'),
+        meta: { requiresAuth: true, role: 'doctor' },
+      },
+      {
+        path: 'today-appointments/',
+        name: 'AppointmentsToday',
+        component: () => import('../views/Doctor/AppointmentsToday.vue'),
+        meta: { requiresAuth: true, role: 'doctor' },
       },
     ],
   },
