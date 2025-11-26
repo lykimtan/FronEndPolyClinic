@@ -99,7 +99,7 @@
       class="w-full py-3.5 bg-white/95 text-indigo-600 rounded-xl text-base font-bold shadow-lg transition-all hover:bg-white hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0"
       @click="handleStartWork"
     >
-      Start to work
+      Bắt đầu ca khám bệnh
     </button>
   </div>
 </template>

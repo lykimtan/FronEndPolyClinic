@@ -63,19 +63,25 @@ const getAvatarUrl = avatar => {
 
     <!-- Navigation Buttons  -->
     <div class="hidden md:flex space-x-4">
-      <button
+      <router-link
+        to="/appointment/schedule"
         class="flex items-center bg-sky-500 text-white font-medium rounded-full px-5 py-2 hover:bg-sky-600 transition"
       >
-        <i class="fa-solid fa-stethoscope mr-2"></i>
-        Schedule Appointment
-      </button>
+        <button>
+          <i class="fa-solid fa-stethoscope mr-2"></i>
+          Đặt lịch khám bệnh
+        </button>
+      </router-link>
 
-      <button
+      <router-link
+        to="/my-appointments"
         class="flex items-center bg-sky-500 text-white font-medium rounded-full px-5 py-2 hover:bg-sky-600 transition"
       >
-        <i class="fa-regular fa-clock mr-2"></i>
-        My Appointment
-      </button>
+        <button>
+          <i class="fa-regular fa-clock mr-2"></i>
+          My Appointment
+        </button>
+      </router-link>
 
       <button
         class="flex items-center bg-sky-500 text-white font-medium rounded-full px-5 py-2 hover:bg-sky-600 transition"

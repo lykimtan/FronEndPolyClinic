@@ -37,7 +37,7 @@ export const useDoctorStore = defineStore('doctor', {
     async fetchDoctorBySpecialization(specializationId) {
       try {
         const doctors = await doctorService.getAllDoctorsBySpecialization(specializationId);
-        return doctors;
+        return doctors.data;
       } catch (error) {
         console.error('Error fetching doctors by specialization:', error);
       }

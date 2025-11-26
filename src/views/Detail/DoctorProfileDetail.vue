@@ -58,7 +58,7 @@
               Quá trình công tác tại phòng khám
             </h4>
             <ul class="space-y-3 text-gray-600 text-sm md:text-base">
-              <li><span class="font-medium">Tổng số lượt khám:</span> {{ doctor.totalExams }}</li>
+              <li><span class="font-medium">Tổng số lượt khám:</span> {{ 20 }}</li>
               <li>
                 <span class="font-medium">Đánh giá trung bình:</span>
                 <div class="flex items-center mt-1 space-x-1">
@@ -66,7 +66,7 @@
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="h-5 w-5"
-                      :class="n <= Math.round(doctor.rating) ? 'text-yellow-400' : 'text-gray-300'"
+                      :class="n <= Math.round(0) ? 'text-yellow-400' : 'text-gray-300'"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -76,7 +76,7 @@
                     </svg>
                   </template>
                 </div>
-                <p class="text-gray-700 font-medium mt-0.5">{{ doctor.rating }}/5</p>
+                <p class="text-gray-700 font-medium mt-0.5">0/5</p>
               </li>
             </ul>
           </div>

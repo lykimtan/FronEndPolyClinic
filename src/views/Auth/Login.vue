@@ -188,8 +188,7 @@ const handleSubmit = async credential => {
         router.push('/staff/dashboard');
       } else if (user.role === 'admin') {
         router.push('/admin/dashboard');
-      }
-      if (user.role === 'doctor') {
+      } else if (user.role === 'doctor') {
         router.push('/doctor/dashboard');
       } else {
         router.push('/');
