@@ -1,12 +1,8 @@
 <script setup>
 import { ref, defineProps } from 'vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/userStore';
-import { toast } from 'vue-sonner';
+
 //import router
 
-const router = useRouter();
-const userStore = useUserStore();
 const isDrawerOpen = ref(false);
 
 const toggleDrawer = () => {
@@ -15,17 +11,6 @@ const toggleDrawer = () => {
 
 const closeDrawer = () => {
   isDrawerOpen.value = false;
-};
-
-const handleLogout = async () => {
-  try {
-    await userStore.logout();
-    toast.success('Đăng xuất thành công!');
-    router.push('/login');
-  } catch (error) {
-    console.error('Logout error:', error);
-    toast.error('Đăng xuất thất bại, vui lòng thử lại');
-  }
 };
 
 const props = defineProps({
@@ -43,7 +28,7 @@ const getAvatarUrl = avatar => {
 </script>
 
 <template>
-  <nav class="flex justify-between items-center bg-white-800 shadow-sm py-3 px-8 sticky top-0 z-10">
+  <nav class="flex justify-between items-center bg-[#F0F8FF] shadow-sm py-3 px-8 sticky top-0 z-10">
     <!-- Logo -->
     <router-link to="/doctor/dashboard">
       <div class="flex items-center space-x-3">
@@ -74,12 +59,15 @@ const getAvatarUrl = avatar => {
         </button>
       </router-link>
 
-      <button
+      <router-link
+        :to="`/doctor/all-appointments`"
         class="flex items-center text-white font-medium rounded-full px-5 py-2 bg-sky-600 hover:text-black hover:bg-sky-400 transition"
       >
-        <i class="fa-regular fa-clock mr-2"></i>
-        Danh mục lịch hẹn
-      </button>
+        <button>
+          <i class="fa-regular fa-clock mr-2"></i>
+          Danh mục lịch hẹn
+        </button>
+      </router-link>
 
       <button
         class="flex items-center text-white font-medium rounded-full px-5 py-2 bg-sky-600 hover:text-black hover:bg-sky-400 transition"

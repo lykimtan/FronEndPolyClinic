@@ -121,17 +121,8 @@
             {{ isSubmitting ? 'Đang xử lý...' : 'Đăng ký' }}
           </button>
 
-          <div class="text-center text-gray-500 text-sm mt-4">
-            or continue with social platforms
-          </div>
-
           <div class="flex justify-center space-x-4 mt-2">
-            <button class="p-2 border rounded-full hover:bg-gray-100">
-              <i class="fab fa-google"></i>
-            </button>
-            <button class="p-2 border rounded-full hover:bg-gray-100">
-              <i class="fab fa-facebook-f"></i>
-            </button>
+            <div id="google-btn" class="w-full flex justify-center"></div>
           </div>
         </Form>
       </div>
@@ -153,6 +144,8 @@
       </div>
     </div>
   </div>
+
+  <Toaster position="top-right" />
 </template>
 
 <script setup>
@@ -162,6 +155,7 @@ import { useUserStore } from '@/stores/userStore';
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
 import { authService } from '@/api/authService';
+import { Toaster, toast } from 'vue-sonner';
 
 // Animation state
 const expanded = ref(true);
@@ -169,6 +163,8 @@ const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const isSubmitting = ref(false);
 const errorMessage = ref('');
+
+const userStore = useUserStore();
 
 const router = useRouter();
 
@@ -262,4 +258,60 @@ const handleSubmit = async values => {
     isSubmitting.value = false;
   }
 };
+
+const handleGoogleLogin = async idToken => {
+  try {
+    const response = await authService.googleLogin({ idToken });
+
+    if (response?.success && response?.data?.user) {
+      const user = response.data.user;
+      toast.success(`Đăng nhập Google thành công! Chào mừng ${user.firstName || ''}!`);
+      userStore.setUser(user);
+
+      // Redirect based on user role
+      if (user.role === 'staff') {
+        router.push('/staff/dashboard');
+      } else if (user.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else if (user.role === 'doctor') {
+        router.push('/doctor/dashboard');
+      } else {
+        router.push('/');
+      }
+    } else {
+      toast.error(response?.message || 'Đăng nhập Google thất bại!');
+    }
+  } catch (error) {
+    console.error('Google login failed:', error);
+    toast.error(error.response?.data?.message || 'Lỗi đăng nhập Google');
+  }
+};
+
+onMounted(() => {
+  // Render nút Google
+  /* global google */
+  // Debug: print client id and origin from module context (cannot use import.meta in browser console)
+  try {
+    console.log('GSI client id (from module):', import.meta.env.VITE_GOOGLE_CLIENT_ID);
+
+    console.log('Page origin:', window.location.origin);
+  } catch (e) {
+    console.warn('Unable to read import.meta.env here', e);
+  }
+  if (window.google) {
+    google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      callback: response => {
+        const idToken = response.credential;
+        handleGoogleLogin(idToken);
+      },
+    });
+
+    google.accounts.id.renderButton(document.getElementById('google-btn'), {
+      theme: 'outline',
+      size: 'large',
+      width: 250,
+    });
+  }
+});
 </script>

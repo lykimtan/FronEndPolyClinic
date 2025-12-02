@@ -123,6 +123,34 @@ const routes = [
         component: () => import('../views/Doctor/AppointmentsToday.vue'),
         meta: { requiresAuth: true, role: 'doctor' },
       },
+
+      {
+        path: 'all-appointments/',
+        name: 'AllAppointments',
+        component: () => import('../views/Doctor/AllAppointments.vue'),
+        meta: { requiresAuth: true, role: 'doctor' },
+      },
+
+      {
+        path: 'appointment/:id',
+        name: 'DetailAppointment',
+        component: () => import('../views/Doctor/DetailAppointment.vue'),
+        meta: { requiresAuth: true, role: 'doctor' },
+      },
+
+      //examination room
+      {
+        path: 'examination-room/:id',
+        name: 'ExaminationRoom',
+        component: () => import('../views/Doctor/ExaminationRoom.vue'),
+        meta: { requiresAuth: true, role: 'doctor' },
+      },
+      {
+        path: 'medical-record/:id',
+        name: 'DetailMedicalRecord',
+        component: () => import('../views/Doctor/DetailMedicalRecord.vue'),
+        meta: { requiresAuth: true, role: 'doctor' },
+      },
     ],
   },
 
@@ -179,6 +207,10 @@ router.beforeEach((to, from, next) => {
   } else {
     next(result);
   }
+});
+
+router.afterEach((to, from) => {
+  window.scrollTo(0, 0);
 });
 
 export default router;

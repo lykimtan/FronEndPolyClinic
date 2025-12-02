@@ -46,6 +46,7 @@
           :key="appointment._id"
           :appointment="appointment"
           @start-work="handleStartWork"
+          @detail-medical-record="handleDetailMedicalRecord"
         />
       </div>
     </div>
@@ -54,12 +55,13 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useAppointmentStore } from '@/stores/appointmentStore';
+import { useRouter } from 'vue-router';
 import AppointmentItem from '@/components/Doctor/ApointmentItem.vue';
 
 const appointmentStore = useAppointmentStore();
 const appointmentsToday = ref([]);
 const today = new Date().toISOString().split('T')[0];
-
+const router = useRouter();
 const formatDateHeader = dateString => {
   const date = new Date(dateString);
   return date.toLocaleDateString('vi-VN', {
@@ -71,13 +73,33 @@ const formatDateHeader = dateString => {
 };
 
 const handleStartWork = appointment => {
-  console.log('Starting work for appointment:', appointment);
-  // TODO: Navigate to medical record or examination page
+  router.push({ name: 'ExaminationRoom', params: { id: appointment._id } });
+};
+
+const handleDetailMedicalRecord = appointment => {
+  router.push({ name: 'DetailMedicalRecord', params: { id: appointment.medicalRecordId } });
 };
 
 onMounted(async () => {
   try {
-    appointmentsToday.value = await appointmentStore.fetchAllAppointmentsByDate('2025-11-22');
+    appointmentsToday.value = await appointmentStore.fetchAllAppointmentsByDate('2025-12-6');
+
+    // Sắp xếp: non-completed ở trên (theo time), completed ở dưới (theo time)
+    appointmentsToday.value.sort((a, b) => {
+      const isCompletedA = a.status === 'completed';
+      const isCompletedB = b.status === 'completed';
+
+      // Nếu status khác nhau: non-completed trước (ở trên)
+      if (isCompletedA !== isCompletedB) {
+        return isCompletedA ? 1 : -1;
+      }
+
+      // Nếu status giống nhau: sắp xếp theo time tăng dần
+      const timeA = a.slotId?.time || '';
+      const timeB = b.slotId?.time || '';
+      return timeA.localeCompare(timeB);
+    });
+
     console.log("Today's appointments:", appointmentsToday.value);
   } catch (error) {
     console.error("Error fetching today's appointments:", error);

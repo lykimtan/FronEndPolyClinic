@@ -1,9 +1,51 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="mx-auto px-4 py-8 bg-[#2563EB]">
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-gray-800 mb-2">Lịch khám của tôi</h1>
-      <p class="text-gray-600">Quản lý và theo dõi các lịch hẹn khám bệnh của bạn</p>
+    <div class="mb-8 text-white">
+      <h1 class="text-4xl font-bold mb-2">Lịch hẹn của tôi</h1>
+      <p class="text-gray-200">Quản lý và theo dõi các lịch hẹn khám bệnh của bạn</p>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="mb-6 bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Search by Patient Name -->
+        <div>
+          <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+            <i class="fa-solid fa-search mr-2 text-blue-600"></i>
+            Tìm kiếm theo tên bệnh nhân
+          </label>
+          <input
+            v-model="searchPatientName"
+            type="text"
+            placeholder="Nhập tên bệnh nhân..."
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 hover:bg-gray-100"
+          />
+        </div>
+
+        <!-- Filter by Date -->
+        <div>
+          <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+            <i class="fa-solid fa-calendar mr-2 text-blue-600"></i>
+            Lọc theo ngày
+          </label>
+          <input
+            v-model="filterDate"
+            type="date"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 hover:bg-gray-100"
+          />
+        </div>
+      </div>
+
+      <!-- Reset Filters Button -->
+      <button
+        v-if="searchPatientName || filterDate"
+        class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium shadow-sm transition-all flex items-center"
+        @click="resetFilters"
+      >
+        <i class="fa-solid fa-times mr-2"></i>
+        Xóa bộ lọc
+      </button>
     </div>
 
     <!-- Filter Tabs -->
@@ -79,11 +121,11 @@
               <!-- Doctor Info -->
               <div class="space-y-3">
                 <div class="flex items-start gap-3">
-                  <i class="fa-solid fa-user-doctor text-blue-500 text-xl mt-1"></i>
+                  <i class="fa-solid fa-bed text-blue-500 text-xl mt-1"></i>
                   <div>
-                    <p class="text-sm text-gray-500 font-medium">Bác sĩ khám</p>
+                    <p class="text-sm text-gray-500 font-medium">Họ tên bệnh nhân</p>
                     <p class="text-lg font-bold text-gray-800">
-                      {{ appointment.doctorId?.fullName || 'Đang cập nhật' }}
+                      {{ appointment.patientId?.fullName || 'Đang cập nhật' }}
                     </p>
                   </div>
                 </div>
@@ -136,15 +178,6 @@
                     </p>
                   </div>
                 </div>
-                <div v-if="appointment.status === 'rejected'" class="flex items-start gap-3">
-                  <i class="fa-solid fa-message text-blue-500 text-xl mt-1"></i>
-                  <div>
-                    <p class="text-sm text-gray-500 font-medium">Lý do từ chối</p>
-                    <p class="text-sm text-gray-600">
-                      {{ appointment.reasonForRejection || 'Không có' }}
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -152,25 +185,25 @@
             <div class="mt-6 flex flex-wrap gap-3">
               <button
                 v-if="appointment.status === 'pending'"
-                class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors duration-300 flex items-center gap-2"
-                @click="cancelAppointment(appointment._id)"
+                class="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-300 flex items-center gap-2"
+                @click="approveAppointment(appointment._id)"
               >
-                <i class="fa-solid fa-xmark"></i>
-                Hủy lịch hẹn
+                <i class="fa-solid fa-check"></i>
+                Duyệt lịch hẹn
               </button>
 
               <button
-                v-if="appointment.status === 'rejected' || appointment.status === 'cancelled'"
+                v-if="appointment.status === 'pending'"
                 class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors duration-300 flex items-center gap-2"
-                @click="deleteAppointment(appointment._id)"
+                @click="rejectAppointment(appointment._id)"
               >
-                <i class="fa-solid fa-trash"></i>
-                Xóa lịch hẹn
+                <i class="fa-solid fa-x"></i>
+                Từ chối lịch hẹn
               </button>
 
               <button
                 class="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-300 flex items-center gap-2"
-                @click="viewDetails(appointment)"
+                @click="viewDetails(appointment._id)"
               >
                 <i class="fa-solid fa-eye"></i>
                 Xem chi tiết
@@ -194,14 +227,7 @@
     <div v-else class="text-center py-20">
       <i class="fa-solid fa-calendar-xmark text-gray-300 text-6xl mb-4"></i>
       <p class="text-xl text-gray-500 font-medium mb-2">Không có lịch hẹn nào</p>
-      <p class="text-sm text-gray-400 mb-6">Bạn chưa đặt lịch khám nào</p>
-      <button
-        class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-300"
-        @click="$router.push('/appointment/schedule')"
-      >
-        <i class="fa-solid fa-calendar-plus mr-2"></i>
-        Đặt lịch khám ngay
-      </button>
+      <p class="text-sm text-gray-400 mb-6">Bạn chưa có lịch hẹn nào</p>
     </div>
   </div>
 </template>
@@ -211,6 +237,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useAppointmentStore } from '@/stores/appointmentStore';
 import { useUserStore } from '@/stores/userStore';
 import Swal from 'sweetalert2';
+import router from '@/router';
 
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
@@ -220,6 +247,8 @@ const currentUser = ref(null);
 
 const loading = ref(true);
 const currentFilter = ref('all');
+const searchPatientName = ref('');
+const filterDate = ref('');
 
 const filterOptions = [
   { label: 'Tất cả', value: 'all' },
@@ -235,8 +264,34 @@ const filteredAppointments = computed(() => {
 });
 
 function getFilteredAppointments(filter) {
-  if (filter === 'all') return appointments.value;
-  return appointments.value.filter(apt => apt.status === filter);
+  let results = appointments.value;
+
+  // Filter by status
+  if (filter !== 'all') {
+    results = results.filter(apt => apt.status === filter);
+  }
+
+  // Filter by patient name
+  if (searchPatientName.value.trim()) {
+    const searchTerm = searchPatientName.value.toLowerCase().trim();
+    results = results.filter(apt => apt.patientId?.fullName?.toLowerCase().includes(searchTerm));
+  }
+
+  // Filter by date
+  if (filterDate.value) {
+    const selectedDate = new Date(filterDate.value).toISOString().split('T')[0];
+    results = results.filter(apt => {
+      const appointmentDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
+      return appointmentDateStr === selectedDate;
+    });
+  }
+
+  return results;
+}
+
+function resetFilters() {
+  searchPatientName.value = '';
+  filterDate.value = '';
 }
 
 function getStatusColor(status) {
@@ -256,7 +311,6 @@ function getStatusIcon(status) {
     confirmed: 'fa-solid fa-check-circle',
     completed: 'fa-solid fa-circle-check',
     cancelled: 'fa-solid fa-ban',
-    rejected: 'fa-solid fa-thumbs-down',
   };
   return icons[status] || 'fa-solid fa-question';
 }
@@ -267,7 +321,7 @@ function getStatusLabel(status) {
     confirmed: 'Đã xác nhận',
     completed: 'Hoàn thành',
     cancelled: 'Đã hủy',
-    rejected: 'Đã bị từ chối',
+    rejected: 'Đã từ chối',
   };
   return labels[status] || 'Không xác định';
 }
@@ -295,71 +349,31 @@ function formatCreatedDate(dateString) {
   });
 }
 
-async function cancelAppointment(appointmentId) {
-  if (confirm('Bạn có chắc chắn muốn hủy lịch hẹn này?')) {
-    try {
-      await appointmentStore.updateAppointmentStatus(appointmentId, 'cancelled');
-      // Refresh appointments
-      await fetchAppointments();
-    } catch (error) {
-      console.error('Error canceling appointment:', error);
-      alert('Có lỗi xảy ra khi hủy lịch hẹn');
-    }
-  }
-}
-
-async function deleteAppointment(appointmentId) {
-  const result = await Swal.fire({
-    title: 'Bạn có chắc chắn?',
-    text: 'Hành động này không thể hoàn tác! Lịch hẹn sẽ bị xóa vĩnh viễn.',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Vâng, xóa nó!',
-    cancelButtonText: 'Hủy bỏ',
-  });
-
-  if (!result.isConfirmed) return;
+async function rejectAppointment(appointmentId) {
+  // Hỏi lý do từ chối (Optional - nâng cao trải nghiệm)
+  const reason = prompt('Nhập lý do từ chối (để trống nếu không cần):');
+  if (reason === null) return; // Nếu user bấm Cancel ở popup
 
   try {
-    Swal.fire({
-      title: 'Đang xóa...',
-      text: 'Vui lòng chờ trong giây lát',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
-    await appointmentStore.deleteAppointment(appointmentId);
+    await appointmentStore.updateAppointmentStatus(appointmentId, 'rejected');
 
     await fetchAppointments();
-
-    Swal.fire({
-      title: 'Đã xóa!',
-      text: 'Lịch hẹn đã được xóa thành công.',
-      icon: 'success',
-      timer: 1500,
-      showConfirmButton: false,
-    });
+    alert('Đã từ chối lịch hẹn.');
   } catch (error) {
-    console.error('Error deleting appointment:', error);
-
-    Swal.fire({
-      title: 'Lỗi!',
-      text: error.message || 'Có lỗi xảy ra khi xóa lịch hẹn.',
-      icon: 'error',
-      confirmButtonText: 'Đóng',
-    });
+    console.error('Lỗi khi từ chối lịch:', error);
+    alert('Có lỗi xảy ra khi hủy lịch hẹn.');
   }
 }
 
-function viewDetails(appointment) {
-  console.log('View appointment details:', appointment);
-  // TODO: Navigate to appointment details page
+function viewDetails(appointmentId) {
+  console.log('View appointment details:', appointmentId);
+  router.push({
+    name: 'DetailAppointment',
+    params: {
+      id: appointmentId,
+    },
+  });
 }
-
 function viewMedicalRecord(medicalRecordId) {
   console.log('View medical record:', medicalRecordId);
   // TODO: Navigate to medical record page
@@ -369,13 +383,57 @@ async function fetchAppointments() {
   try {
     loading.value = true;
     // TODO: Get actual patient ID from auth store
-    const patientId = currentUser.value; // Replace with actual user ID
-    appointments.value = await appointmentStore.fetchAppointmentsByPatientId(patientId);
+    const doctorId = currentUser.value; // Replace with actual user ID
+    appointments.value = await appointmentStore.fetchAppointmentsByDoctorId(doctorId);
     console.log('Fetched appointments:', appointments.value);
   } catch (error) {
     console.error('Error fetching appointments:', error);
   } finally {
     loading.value = false;
+  }
+}
+
+async function approveAppointment(appointmentId) {
+  const result = await Swal.fire({
+    title: 'Xác nhận duyệt lịch?',
+    text: 'Bạn có chắc chắn muốn duyệt lịch hẹn này không?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#10B981',
+    cancelButtonColor: '#6B7280',
+    confirmButtonText: 'Đồng ý duyệt',
+    cancelButtonText: 'Hủy bỏ',
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    Swal.fire({
+      title: 'Đang xử lý...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    await appointmentStore.updateAppointmentStatus(appointmentId, 'confirmed');
+    await fetchAppointments();
+
+    // Thông báo thành công
+    Swal.fire({
+      title: 'Thành công!',
+      text: 'Đã duyệt lịch hẹn thành công.',
+      icon: 'success',
+      confirmButtonColor: '#10B981',
+      timer: 2000,
+    });
+  } catch (error) {
+    console.error('Lỗi khi duyệt lịch:', error);
+    Swal.fire({
+      title: 'Lỗi!',
+      text: 'Có lỗi xảy ra, vui lòng thử lại.',
+      icon: 'error',
+    });
   }
 }
 

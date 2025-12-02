@@ -9,6 +9,19 @@ class AppointmentService {
     return res.data;
   }
 
+  async getAppointmentById(appointmentId) {
+    const res = await privateApi.get(`${this.baseUrl}/${appointmentId}`);
+    return res.data;
+  }
+
+  async updateMedicalRecordForAppointment(appointmentId, medicalRecordData) {
+    const res = await privateApi.put(
+      `${this.baseUrl}/${appointmentId}/medical-record`,
+      medicalRecordData
+    );
+    return res.data;
+  }
+
   async getAllAppointments() {
     const res = await privateApi.get(this.baseUrl);
     return res.data;
@@ -31,8 +44,16 @@ class AppointmentService {
     return res.data;
   }
 
-  async updateAppointmentStatus(appointmentId, status) {
-    const res = await privateApi.put(`${this.baseUrl}/${appointmentId}/status`, { status });
+  async updateAppointmentStatus(appointmentId, status, reasonForRejection = '') {
+    const res = await privateApi.put(`${this.baseUrl}/${appointmentId}/status`, {
+      status,
+      reasonForRejection,
+    });
+    return res.data;
+  }
+
+  async deleteAppointment(appointmentId) {
+    const res = await privateApi.delete(`${this.baseUrl}/${appointmentId}`);
     return res.data;
   }
 }

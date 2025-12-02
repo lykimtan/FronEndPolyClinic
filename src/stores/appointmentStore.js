@@ -30,6 +30,36 @@ export const useAppointmentStore = defineStore('appointmentStore', {
       }
     },
 
+    async fetchAppointmentById(appointmentId) {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const response = await AppointmentService.getAppointmentById(appointmentId);
+        return response.data;
+      } catch (err) {
+        this.error = 'Không thể tải cuộc hẹn: ' + err.message;
+        throw err;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async fetchAppointmentsByDoctorId(doctorId) {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const response = await AppointmentService.getAppointmentsByDoctorId(doctorId);
+        this.appointments = response.data;
+        return response.data;
+      } catch (err) {
+        this.error = 'Không thể tải cuộc hẹn của bác sĩ: ' + err.message;
+        this.appointments = [];
+        throw err;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
     async fetchAppointmentsByPatientId(patientId) {
       this.isLoading = true;
       this.error = null;
@@ -56,6 +86,55 @@ export const useAppointmentStore = defineStore('appointmentStore', {
       } catch (err) {
         this.error = 'Không thể tải cuộc hẹn theo ngày: ' + err.message;
         this.appointments = [];
+        throw err;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async updateAppointmentStatus(appointmentId, status, reasonForRejection = '') {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const response = await AppointmentService.updateAppointmentStatus(
+          appointmentId,
+          status,
+          reasonForRejection
+        );
+        return response.data;
+      } catch (err) {
+        this.error = 'Không thể cập nhật trạng thái cuộc hẹn: ' + err.message;
+        throw err;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async deleteAppointment(appointmentId) {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const response = await AppointmentService.deleteAppointment(appointmentId);
+        return response.data;
+      } catch (err) {
+        this.error = 'Không thể xóa cuộc hẹn: ' + err.message;
+        throw err;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async updateMedicalRecordForAppointment(appointmentId, medicalRecordData) {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const response = await AppointmentService.updateMedicalRecordForAppointment(
+          appointmentId,
+          medicalRecordData
+        );
+        return response.data;
+      } catch (err) {
+        this.error = 'Không thể cập nhật hồ sơ y tế cho cuộc hẹn: ' + err.message;
         throw err;
       } finally {
         this.isLoading = false;

@@ -1,6 +1,7 @@
 <template>
   <div
-    class="bg-gradient-to-br from-indigo-500 via-purple-500 to-purple-700 rounded-3xl p-6 mb-4 shadow-xl text-white transition-transform hover:-translate-y-1"
+    class="rounded-3xl p-6 mb-4 shadow-xl text-white transition-transform hover:-translate-y-1"
+    :class="getCardClass(appointment.status)"
   >
     <!-- Time and Status -->
     <div class="flex justify-between items-center mb-5">
@@ -96,10 +97,18 @@
 
     <!-- Action Button -->
     <button
+      v-if="appointment.status !== 'completed'"
       class="w-full py-3.5 bg-white/95 text-indigo-600 rounded-xl text-base font-bold shadow-lg transition-all hover:bg-white hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0"
       @click="handleStartWork"
     >
       Bắt đầu ca khám bệnh
+    </button>
+    <button
+      v-if="appointment.status == 'completed'"
+      class="w-full py-3.5 bg-white/95 text-indigo-600 rounded-xl text-base font-bold shadow-lg transition-all hover:bg-white hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0"
+      @click="handleDetailMedicalRecord"
+    >
+      Chi tiết bệnh án
     </button>
   </div>
 </template>
@@ -114,7 +123,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['start-work']);
+const emit = defineEmits(['start-work', 'detail-medical-record']);
 
 const formatTime = time => {
   if (!time) return 'N/A';
@@ -137,17 +146,31 @@ const getStatusClass = status => {
   return statusMap[status] || 'bg-yellow-400/90 text-gray-800';
 };
 
+const getCardClass = status => {
+  const cardMap = {
+    pending: 'bg-gradient-to-br from-indigo-500 via-purple-500 to-purple-700',
+    confirmed: 'bg-gradient-to-br from-indigo-500 via-purple-500 to-purple-700',
+    completed: 'bg-gradient-to-br from-green-500 via-emerald-500 to-green-700',
+    cancelled: 'bg-gradient-to-br from-red-500 via-rose-500 to-red-700',
+  };
+  return cardMap[status] || 'bg-gradient-to-br from-indigo-500 via-purple-500 to-purple-700';
+};
+
 const getStatusText = status => {
   const statusMap = {
-    pending: 'Pending',
-    confirmed: 'Approved',
-    completed: 'Completed',
-    cancelled: 'Cancelled',
+    pending: 'Chờ xác nhận',
+    confirmed: 'Đã xác nhận',
+    completed: 'Hoàn thành',
+    cancelled: 'Đã hủy',
   };
-  return statusMap[status] || 'Pending';
+  return statusMap[status] || 'Chờ xác nhận';
 };
 
 const handleStartWork = () => {
   emit('start-work', props.appointment);
+};
+
+const handleDetailMedicalRecord = () => {
+  emit('detail-medical-record', props.appointment);
 };
 </script>
