@@ -34,6 +34,15 @@ class PrescribedMedicationService {
       throw error.response?.data || error;
     }
   }
+
+  async updatePrescribedMedication(id, medicationData) {
+    try {
+      const response = await privateApi.patch(`${this.baseUrl}/${id}`, medicationData);
+      return response.data.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
 }
 
 export default new PrescribedMedicationService();

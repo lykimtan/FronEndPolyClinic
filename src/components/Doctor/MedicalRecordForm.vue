@@ -240,9 +240,12 @@ const submitMedicalRecord = async () => {
       title: 'Thành công!',
       text: 'Hồ sơ y tế đã được tạo thành công',
       icon: 'success',
-      confirmButtonText: 'Đóng',
+      confirmButtonText: 'Tiếp tục kê đơn thuốc',
     }).then(() => {
-      router.back();
+      router.push({
+        name: 'FormPrescribedMedication',
+        params: { medicalRecordId: createdRecord._id },
+      });
     });
   } catch (error) {
     console.error('Error creating medical record:', error);

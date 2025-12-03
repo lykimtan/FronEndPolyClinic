@@ -151,6 +151,19 @@ const routes = [
         component: () => import('../views/Doctor/DetailMedicalRecord.vue'),
         meta: { requiresAuth: true, role: 'doctor' },
       },
+
+      {
+        path: 'prescribed-medication-form/:medicalRecordId',
+        name: 'FormPrescribedMedication',
+        component: () => import('../views/Doctor/PrecribedMedicationForm.vue'),
+        meta: { requiresAuth: true, role: 'doctor' },
+      },
+      {
+        path: 'prescribed-medication-edit/:prescribedMedicationId',
+        name: 'EditPrescribedMedication',
+        component: () => import('../views/Doctor/PrecribedMedicationForm.vue'),
+        meta: { requiresAuth: true, role: 'doctor' },
+      },
     ],
   },
 
@@ -189,6 +202,21 @@ const routes = [
         component: () => import('../views/Staff/RecurringScheduleManagement.vue'),
         meta: { requiresAuth: true, role: 'staff' },
       },
+
+      //medication management
+      {
+        path: 'medication-management',
+        name: 'MedicationManagement',
+        component: () => import('../views/Staff/MedicationManagement.vue'),
+        meta: { requiresAuth: true, role: 'staff' },
+      },
+      //form to create or update medication
+      {
+        path: 'medication-form/:id?',
+        name: 'MedicationForm',
+        component: () => import('../views/Staff/FormMedication.vue'),
+        meta: { requiresAuth: true, role: 'staff' },
+      },
     ],
   },
 ];
@@ -196,6 +224,13 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { top: 0, behavior: 'smooth' };
+    }
+  },
 });
 
 // Add global navigation guard
@@ -207,10 +242,6 @@ router.beforeEach((to, from, next) => {
   } else {
     next(result);
   }
-});
-
-router.afterEach((to, from) => {
-  window.scrollTo(0, 0);
 });
 
 export default router;
