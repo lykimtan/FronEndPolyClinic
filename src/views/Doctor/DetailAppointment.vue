@@ -293,11 +293,12 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAppointmentStore } from '@/stores/appointmentStore';
 import Swal from 'sweetalert2';
 
 const route = useRoute();
+const router = useRouter();
 const appointmentStore = useAppointmentStore();
 const appointment = ref(null);
 
@@ -397,6 +398,14 @@ const fetchAppointmentDetails = async () => {
   }
 };
 
+const viewMedicalRecord = medicalRecordId => {
+  console.log('View medical record:', medicalRecordId);
+  router.push({
+    name: 'DetailMedicalRecord',
+    params: { id: medicalRecordId },
+  });
+};
+
 async function approveAppointment(appointmentId) {
   const result = await Swal.fire({
     title: 'Xác nhận duyệt lịch?',
@@ -412,7 +421,6 @@ async function approveAppointment(appointmentId) {
   if (!result.isConfirmed) return;
 
   try {
-    // Hiện loading trong lúc chờ API
     Swal.fire({
       title: 'Đang xử lý...',
       allowOutsideClick: false,
@@ -460,12 +468,11 @@ async function rejectAppointment(appointmentId) {
 
   if (!result.isConfirmed) return;
 
-  const reason = result.value; // Lấy lý do người dùng nhập
+  const reason = result.value;
 
   try {
     await appointmentStore.updateAppointmentStatus(appointmentId, 'rejected', reason);
 
-    // 3. Refresh lại giao diện
     await fetchAppointmentDetails();
 
     Swal.fire('Đã từ chối', 'Lịch hẹn đã được cập nhật.', 'success');

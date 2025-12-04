@@ -208,10 +208,12 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAppointmentStore } from '@/stores/appointmentStore';
 import { useUserStore } from '@/stores/userStore';
 import Swal from 'sweetalert2';
 
+const router = useRouter();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
 
@@ -356,13 +358,18 @@ async function deleteAppointment(appointmentId) {
 }
 
 function viewDetails(appointment) {
-  console.log('View appointment details:', appointment);
-  // TODO: Navigate to appointment details page
+  router.push({
+    name: 'MyDetailAppointment',
+    params: { id: appointment._id },
+  });
 }
 
 function viewMedicalRecord(medicalRecordId) {
   console.log('View medical record:', medicalRecordId);
-  // TODO: Navigate to medical record page
+  router.push({
+    name: 'MyDetailMedicalRecord',
+    params: { id: medicalRecordId },
+  });
 }
 
 async function fetchAppointments() {

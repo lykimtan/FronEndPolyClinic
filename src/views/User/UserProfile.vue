@@ -76,7 +76,7 @@
     />
   </div>
 
-  <div class="relative">
+  <div v-if="userInfo.role == 'patient'" class="relative">
     <div class="absolute right-5 top-5 flex gap-2 z-10">
       <button
         class="w-10 h-10 rounded-full bg-white shadow-lg hover:bg-gray-100 transition flex items-center justify-center"
@@ -98,15 +98,64 @@
       ref="scrollContainer"
       class="flex flex-nowrap p-5 bg-gray-100 snap-x gap-4 overflow-x-auto scroll-smooth"
     >
-      <!-- Example history items -->
+      <!-- Loading state -->
       <div
-        v-for="n in 5"
-        :key="n"
-        :style="{ animationDelay: `${n * 0.5}s` }"
-        class="relative group flex-shrink-0 text-center snap-center w-80 h-60 bg-white rounded-lg shadow-md p-4 bg-[url('../assets/images/medicalRecord.png')] bg-cover bg-center transform transition-all duration-700 ease-out opacity-0 translate-x-6 animate-fadeInLeft"
+        v-if="medicalRecordStore.getIsLoading"
+        class="flex items-center justify-center w-full py-8"
       >
-        <h3 class="font-bold text-lg mb-2">Lịch sử khám bệnh {{ n }}</h3>
-        <p class="text-gray-600">Chi tiết về lần khám bệnh thứ {{ n }} sẽ hiển thị ở đây.</p>
+        <div class="text-center">
+          <i class="fa-solid fa-spinner animate-spin text-3xl text-blue-500 mb-3"></i>
+          <p class="text-gray-600">Đang tải dữ liệu...</p>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div
+        v-else-if="!medicalRecords || medicalRecords.length === 0"
+        class="w-full flex items-center justify-center py-8"
+      >
+        <p class="text-gray-600">Chưa có bản ghi y khoa nào</p>
+      </div>
+
+      <!-- Medical records list -->
+      <div
+        v-for="(record, index) in medicalRecords"
+        :key="record._id || index"
+        :style="{ animationDelay: `${index * 0.1}s` }"
+        class="relative group flex-shrink-0 text-center snap-center w-80 h-60 bg-white rounded-lg shadow-md p-4 cursor-pointer transform transition-all duration-700 ease-out opacity-0 translate-x-6 animate-fadeInLeft hover:shadow-lg hover:scale-105"
+        @click="goToDetailRecord(record._id)"
+      >
+        <!-- Record info -->
+        <div
+          class="h-full flex flex-col justify-between bg-[url('src/assets/images/medicalRecord.png')] bg-cover bg-center rounded-lg p-4"
+        >
+          <div>
+            <h3 class="font-bold text-lg mb-2 text-blue-600">Lần khám thứ {{ index + 1 }}</h3>
+            <p class="text-gray-700 text-sm mb-2">
+              <span class="font-bold">Bác sĩ:</span>
+              {{ record.doctorId?.firstName }} {{ record.doctorId?.lastName }}
+            </p>
+            <p class="text-gray-700 text-sm mb-2 font-bold">
+              <span class="font-bold">Chuyên khoa:</span>
+              {{ record.appointmentId?.specializationId?.name || 'N/A' }}
+            </p>
+            <p class="text-gray-600 text-xs mb-2">
+              <span class="font-semibold">Ngày:</span>
+              {{ formatDate(record.appointmentId?.appointmentDate) }}
+            </p>
+          </div>
+          <div class="mt-2 pt-3 border-t border-gray-300">
+            <p class="text-gray-600 text-sm truncate">
+              {{ record.diagnosis || 'Chưa có chẩn đoán' }}
+            </p>
+            <div
+              class="mt-2 text-blue-500 font-medium text-sm flex items-center justify-center gap-1"
+            >
+              <span>Xem chi tiết</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -117,17 +166,26 @@ import { ref, computed, watch, onMounted } from 'vue';
 import UserProfileRequestCard from '@/components/UserProfileRequestCard.vue';
 import { useUserStore } from '@/stores/userStore';
 import { useRoleRequestedStore } from '@/stores/RoleRequestedStore';
+import { useMedicalRecordStore } from '@/stores/MedicalRecordStore';
 import router from '@/router';
 import { toast } from 'vue-sonner';
 
 const userStore = useUserStore();
 const roleStore = useRoleRequestedStore();
+const medicalRecordStore = useMedicalRecordStore();
 // Use computed to reactively get user info
 const userInfo = computed(() => userStore.getUserInfo);
 
 onMounted(async () => {
   await roleStore.getMyRequests(); // gọi API và lưu vào state
   console.log('Fetched role requests in UserProfile:', roleStore.roleRequests);
+
+  // Fetch medical record count
+  if (userInfo.value?.id) {
+    await medicalRecordStore.fetchRecordCountByPatient(userInfo.value.id);
+    // Fetch all medical records for the patient
+    await medicalRecordStore.fetchRecordsByPatient(userInfo.value.id);
+  }
 });
 const roleRequests = computed(() => roleStore.roleRequests);
 
@@ -138,7 +196,6 @@ watch(
   userInfo,
   newValue => {
     if (!newValue || !newValue.id) {
-      console.warn('User not authenticated, redirecting to login...');
       router.push('/login');
     }
   },
@@ -162,6 +219,14 @@ const formatDate = dateStr => {
   });
 };
 
+// Get medical records list from store
+const medicalRecords = computed(() => medicalRecordStore.getRecordsList);
+
+// Navigate to medical record detail page
+const goToDetailRecord = recordId => {
+  router.push({ name: 'MyDetailMedicalRecord', params: { id: recordId } });
+};
+
 // Use computed for reactive userStats
 const userStats = computed(() => [
   { icon: 'fa-solid fa-envelope', value: 'Email', label: userInfo.value?.email || 'Chưa cập nhật' },
@@ -174,13 +239,20 @@ const userStats = computed(() => [
   {
     icon: 'fa-solid fa-notes-medical',
     value: 'Bản ghi y khoa',
-    label: '0',
+    label: medicalRecordStore.getRecordCount,
   },
-  { icon: 'fa-solid fa-comment', value: 'Lượt Feedback', label: 10 },
   {
-    icon: 'fa-solid fa-award',
+    icon: 'fa-solid fa-house',
+    value: 'Địa chỉ',
+    label: userInfo.value?.address || 'Chưa cập nhật',
+  },
+  {
+    icon: 'fa-solid fa-stethoscope',
     value: 'Lần khám gần nhất',
-    label: '10/01/2025',
+    label:
+      medicalRecords.value.length > 0 && medicalRecords.value[0].appointmentId?.appointmentDate
+        ? formatDate(medicalRecords.value[0].appointmentId?.appointmentDate)
+        : 'Chưa có',
   },
 ]);
 console.log('User Info in UserProfile:', userInfo.value);

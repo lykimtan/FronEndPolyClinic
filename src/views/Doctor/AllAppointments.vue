@@ -375,15 +375,16 @@ function viewDetails(appointmentId) {
   });
 }
 function viewMedicalRecord(medicalRecordId) {
-  console.log('View medical record:', medicalRecordId);
-  // TODO: Navigate to medical record page
+  router.push({
+    name: 'DetailMedicalRecord',
+    params: { id: medicalRecordId },
+  });
 }
 
 async function fetchAppointments() {
   try {
     loading.value = true;
-    // TODO: Get actual patient ID from auth store
-    const doctorId = currentUser.value; // Replace with actual user ID
+    const doctorId = currentUser.value;
     appointments.value = await appointmentStore.fetchAppointmentsByDoctorId(doctorId);
     console.log('Fetched appointments:', appointments.value);
   } catch (error) {

@@ -61,6 +61,26 @@ const routes = [
         name: 'MyAppointments',
         component: () => import('../views/MyAppointment.vue'),
       },
+      {
+        path: '/my-appointment/:id',
+        name: 'MyDetailAppointment',
+        component: () => import('../views/MyDetailAppointment.vue'),
+      },
+      {
+        path: '/my-medical-records',
+        name: 'MyMedicalRecords',
+        component: () => import('../views/MyMedicalRecord.vue'),
+      },
+      {
+        path: '/my-medical-record/:id',
+        name: 'MyDetailMedicalRecord',
+        component: () => import('../views/MyDetailMedicalRecord.vue'),
+      },
+      {
+        path: '/fna-forum',
+        name: 'FnAForum',
+        component: () => import('../views/FnAForum.vue'),
+      },
     ],
   },
 
@@ -162,6 +182,12 @@ const routes = [
         path: 'prescribed-medication-edit/:prescribedMedicationId',
         name: 'EditPrescribedMedication',
         component: () => import('../views/Doctor/PrecribedMedicationForm.vue'),
+        meta: { requiresAuth: true, role: 'doctor' },
+      },
+      {
+        path: 'fna-questions',
+        name: 'DoctorFnAQuestions',
+        component: () => import('../views/Doctor/FnADoctorView.vue'),
         meta: { requiresAuth: true, role: 'doctor' },
       },
     ],

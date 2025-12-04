@@ -2,34 +2,34 @@
 import ListSpecialization from '@/components/ListSpecialization.vue';
 import FuturedDoctorsList from '@/components/FuturedDoctorsList.vue';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/userStore';
+
 import Advertisement from '@/components/Advertisement.vue';
 import FandA from '@/components/FandA.vue';
-import { useDoctorStore } from '@/stores/DoctorStore';
 import { useSpecializationStore } from '@/stores/specializationStore';
+import { useRatingStore } from '@/stores/RatingStore';
 
 const router = useRouter();
 import { onMounted, computed } from 'vue';
 const storeSpecialization = useSpecializationStore();
+const ratingStore = useRatingStore();
 
 onMounted(async () => {
-  // fetch and populate specializations into the store when HomeView mounts
   await storeSpecialization.fetchSpecializations();
-  console.log('Specializations fetched in HomeView: ', storeSpecialization.getAll);
-});
-// make specializations reactive so it updates after fetchSpecializations completes
-const specializations = computed(() => storeSpecialization.getAll);
-const store = useDoctorStore();
-const userStore = useUserStore();
 
-const userInfo = userStore.getUserInfo ? userStore.getUserInfo : null;
-console.log('User Info in HomeView:', userInfo);
+  // fetch top rated doctors (with rating >= 4.5)
+  await ratingStore.fetchTopRatedDoctors(10, 4.5);
+});
+
+const specializations = computed(() => storeSpecialization.getAll);
 
 function handleGoToDetail(specializationId) {
   router.push({ name: 'SpecializationDetail', params: { id: specializationId } });
 }
 
-const doctors = store.getDoctorByRating;
+// Get top rated doctors from rating store
+const doctors = computed(() => {
+  return ratingStore.getTopRatedDoctors;
+});
 </script>
 
 <template>

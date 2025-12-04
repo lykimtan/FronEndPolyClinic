@@ -4,14 +4,18 @@ import MedicalRecordService from '@/api/medicalRecordService';
 export const useMedicalRecordStore = defineStore('medicalRecord', {
   state: () => ({
     currentRecord: null, // Hồ sơ hiện tại đang xem
+    recordsList: [], // Danh sách hồ sơ của bệnh nhân
     isLoading: false,
     error: null,
+    recordCount: 0, // Số lượng hồ sơ của bệnh nhân
   }),
 
   getters: {
     getCurrentRecord: state => state.currentRecord,
+    getRecordsList: state => state.recordsList,
     getIsLoading: state => state.isLoading,
     getError: state => state.error,
+    getRecordCount: state => state.recordCount,
   },
 
   actions: {
@@ -32,16 +36,34 @@ export const useMedicalRecordStore = defineStore('medicalRecord', {
       }
     },
 
-    // Fetch hồ sơ của một bệnh nhân (không lưu store, chỉ return về)
+    // Fetch hồ sơ của một bệnh nhân và lưu vào store
     async fetchRecordsByPatient(patientId) {
       this.isLoading = true;
       this.error = null;
       try {
         const response = await MedicalRecordService.getRecordsByPatient(patientId);
-        return response; // Return trực tiếp, không lưu store
+        this.recordsList = response || []; // Lưu vào store
+        return response;
       } catch (error) {
         this.error = error.message;
         console.error('Error fetching patient records:', error);
+        throw error;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    // Fetch số lượng hồ sơ của một bệnh nhân
+    async fetchRecordCountByPatient(patientId) {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const count = await MedicalRecordService.getRecordCountByPatient(patientId);
+        this.recordCount = count;
+        return count;
+      } catch (error) {
+        this.error = error.message;
+        console.error('Error fetching record count:', error);
         throw error;
       } finally {
         this.isLoading = false;

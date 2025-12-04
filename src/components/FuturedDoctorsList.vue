@@ -1,106 +1,148 @@
 <script setup>
 import { ref, defineProps } from 'vue';
+import { useRouter } from 'vue-router';
 
-//them props
+const router = useRouter();
+
 const props = defineProps({
   doctors: {
     type: Array,
     default: () => [],
   },
 });
+
 const scrollContainer = ref(null);
+
 const scrollLeft = () => {
   if (scrollContainer.value) {
-    scrollContainer.value.scrollBy({
-      left: -300,
-      behavior: 'smooth',
-    });
+    scrollContainer.value.scrollBy({ left: -320, behavior: 'smooth' }); // Tăng khoảng cách scroll cho khớp với card
   }
 };
 
 const scrollRight = () => {
   if (scrollContainer.value) {
-    scrollContainer.value.scrollBy({
-      left: 300,
-      behavior: 'smooth',
-    });
+    scrollContainer.value.scrollBy({ left: 320, behavior: 'smooth' });
   }
 };
-</script>
-<template>
-  <div class="relative">
-    <h2 class="pl-5 pt-5 font-bold text-xl">Bác sĩ nổi bậc</h2>
 
-    <div class="absolute right-5 top-5 flex gap-2 z-10">
-      <button
-        class="w-10 h-10 rounded-full bg-white shadow-lg hover:bg-gray-100 transition flex items-center justify-center"
-        aria-label="Scroll left"
-        @click="scrollLeft"
-      >
-        <i class="fa-solid fa-chevron-left text-gray-700"></i>
-      </button>
-      <button
-        class="w-10 h-10 rounded-full bg-white shadow-lg hover:bg-gray-100 transition flex items-center justify-center"
-        aria-label="Scroll right"
-        @click="scrollRight"
-      >
-        <i class="fa-solid fa-chevron-right text-gray-700"></i>
-      </button>
+const getAvatarUrl = avatar => {
+  if (!avatar) return '/src/assets/images/avartar.jpg';
+  if (avatar.startsWith('http')) return avatar;
+  return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}${avatar}`;
+};
+
+const getFullName = doctor => {
+  return `${doctor.lastName} ${doctor.firstName}`;
+};
+
+const getSpecialization = doctor => {
+  return doctor.specializationIds?.[0]?.name || 'Đa khoa';
+};
+
+const goToBookScreen = specializationIds => {
+  // Kiểm tra an toàn trước khi map
+  if (!specializationIds || specializationIds.length === 0) return;
+  const ids = specializationIds.map(spec => spec._id).join(',');
+  router.push({
+    name: 'SpecializationDetail',
+    params: { id: ids },
+  });
+};
+</script>
+
+<template>
+  <div class="relative py-8">
+    <div class="flex justify-between items-end px-5 mb-6">
+      <div>
+        <h2 class="font-bold text-2xl text-slate-800">Bác sĩ nổi bật</h2>
+        <p class="text-slate-500 text-sm mt-1">Các chuyên gia hàng đầu sẵn sàng hỗ trợ bạn</p>
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          class="w-10 h-10 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all shadow-sm flex items-center justify-center"
+          aria-label="Scroll left"
+          @click="scrollLeft"
+        >
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button
+          class="w-10 h-10 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all shadow-sm flex items-center justify-center"
+          aria-label="Scroll right"
+          @click="scrollRight"
+        >
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
     </div>
 
     <div
       ref="scrollContainer"
-      class="flex flex-nowrap p-5 bg-gray-100 snap-x gap-4 overflow-x-auto scroll-smooth"
+      class="flex overflow-x-auto snap-x gap-6 px-5 pb-8 scroll-smooth hide-scrollbar"
     >
       <div
         v-for="doctor in props.doctors"
-        :key="doctor.id"
-        class="relative group flex-shrink-0 text-center snap-center w-80"
+        :key="doctor._id"
+        class="group relative flex-shrink-0 snap-center w-72 bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
       >
-        <!-- Ảnh -->
-        <img
-          class="w-80 h-90 rounded-tl-lg rounded-tr-lg object-cover"
-          :src="doctor.image"
-          alt=""
-        />
+        <div class="relative h-80 overflow-hidden rounded-t-2xl">
+          <img
+            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            :src="getAvatarUrl(doctor.avatar)"
+            :alt="getFullName(doctor)"
+          />
 
-        <!-- Overlay -->
-        <div
-          class="absolute inset-0 bg-black/60 flex flex-col items-center justify-evenly opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 rounded-lg"
-        >
-          <p class="font-bold p-4 text-3xl text-sky-300">{{ doctor.name }}</p>
-          <p class="font-bold p-4 text-xl text-sky-300">Chuyên khoa: {{ doctor.specialization }}</p>
-          <button class="bg-blue-500 text-white p-5 py-2 rounded-lg text-2xl">
-            Đặt lịch khám bệnh
-          </button>
-        </div>
-
-        <div class="bg-gray-400 rounded-br-lg rounded-bl-lg">
-          <p class="font-bold p-4 text-2xl">{{ doctor.name }}</p>
-          <div class="flex justify-around font-semibold">
-            <p class="text-gray-500 text-lg">Chuyên khoa</p>
-            <p class="text-gray-700 text-lg ml-1">{{ doctor.specialization }}</p>
+          <div
+            class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-semibold text-slate-700 shadow-sm"
+          >
+            {{ doctor.yearsOfExperience }}+ năm KN
           </div>
 
-          <p class="text-gray-700 text-lg p-3">{{ doctor.yearOfExperience }} năm kinh nghiệm</p>
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4"
+          >
+            <button
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-center gap-2"
+              @click="goToBookScreen(doctor.specializationIds)"
+            >
+              <span>Đặt lịch ngay</span>
+              <i class="fa-regular fa-calendar-check"></i>
+            </button>
+          </div>
+        </div>
 
-          <div class="flex items-center space-x-1 p-3 justify-center">
-            <i
-              v-for="star in 5"
-              :key="star"
-              class="text-lg"
-              :class="
-                doctor.ratingAverage >= star
-                  ? 'fa-solid fa-star text-yellow-400'
-                  : doctor.ratingAverage >= star - 0.5
-                    ? 'fa-solid fa-star-half-stroke text-yellow-400'
-                    : 'fa-regular fa-star text-gray-300'
-              "
-            ></i>
-            <span class="text-gray-600 text-sm ml-2">({{ doctor.ratingAverage }}/5)</span>
+        <div class="p-4">
+          <p class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-1">
+            {{ getSpecialization(doctor) }}
+          </p>
+
+          <h3
+            class="font-bold text-lg text-slate-800 line-clamp-1 mb-2"
+            :title="getFullName(doctor)"
+          >
+            {{ getFullName(doctor) }}
+          </h3>
+
+          <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+            <div class="flex items-center gap-1">
+              <i class="fa-solid fa-star text-yellow-400 text-sm"></i>
+              <span class="font-bold text-slate-700">{{ doctor.averageRating || 0 }}</span>
+              <span class="text-slate-400 text-sm">/5</span>
+            </div>
+            <div class="text-slate-400 text-sm">Đánh giá</div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>

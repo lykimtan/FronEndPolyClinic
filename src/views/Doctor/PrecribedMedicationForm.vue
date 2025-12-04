@@ -39,6 +39,7 @@
                 <th class="px-4 py-2 text-center font-semibold text-gray-700">Dạng</th>
                 <th class="px-4 py-2 text-left font-semibold text-gray-700">Liều Lượng</th>
                 <th class="px-4 py-2 text-left font-semibold text-gray-700">Tần Suất</th>
+                <th class="px-4 py-2 text-left font-semibold text-gray-700">Số Lượng</th>
                 <th class="px-4 py-2 text-left font-semibold text-gray-700">Ghi Chú</th>
                 <th class="px-4 py-2 text-right font-semibold text-gray-700">Hành Động</th>
               </tr>
@@ -65,6 +66,15 @@
                     v-model="drug.frequency"
                     type="text"
                     placeholder="3 lần/ngày"
+                    class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </td>
+                <td class="px-4 py-2">
+                  <input
+                    v-model.number="drug.quantity"
+                    type="number"
+                    placeholder="Ví dụ: 30"
+                    min="1"
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </td>
@@ -249,6 +259,7 @@ onMounted(async () => {
           medicationForm: drug.drugId.form,
           dosage: drug.dosage,
           frequency: drug.frequency,
+          quantity: drug.quantity || 1,
           note: drug.note || '',
         }));
       }
@@ -281,6 +292,7 @@ const addDrug = medication => {
     medicationForm: medication.form,
     dosage: '',
     frequency: '',
+    quantity: 1,
     note: '',
   });
 
@@ -331,6 +343,7 @@ const handleSubmit = async () => {
         drugId: d.drugId,
         dosage: d.dosage,
         frequency: d.frequency,
+        quantity: d.quantity || 1,
         note: d.note,
       })),
     };

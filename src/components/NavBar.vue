@@ -79,16 +79,19 @@ const getAvatarUrl = avatar => {
       >
         <button>
           <i class="fa-regular fa-clock mr-2"></i>
-          My Appointment
+          Lịch hẹn khám của tôi
         </button>
       </router-link>
 
-      <button
+      <router-link
+        to="/my-medical-records"
         class="flex items-center bg-sky-500 text-white font-medium rounded-full px-5 py-2 hover:bg-sky-600 transition"
       >
-        <i class="fa-solid fa-notes-medical mr-2"></i>
-        Medical Record
-      </button>
+        <button>
+          <i class="fa-solid fa-notes-medical mr-2"></i>
+          Hồ sơ bệnh án
+        </button>
+      </router-link>
       <router-link to="/userProfile">
         <button
           class="flex items-center bg-sky-500 text-white font-medium rounded-full px-5 py-2 hover:bg-sky-600 transition"

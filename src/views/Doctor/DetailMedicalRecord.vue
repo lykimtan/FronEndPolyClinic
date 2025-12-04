@@ -112,6 +112,7 @@ const printPrescriptions = () => {
               <td style="border: 1px solid #ddd; padding: 8px;">${drug.drugId?.name || 'N/A'}</td>
               <td style="border: 1px solid #ddd; padding: 8px;">${drug.dosage || 'N/A'}</td>
               <td style="border: 1px solid #ddd; padding: 8px;">${drug.frequency || 'N/A'}</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">${drug.quantity || 'N/A'}</td>
               <td style="border: 1px solid #ddd; padding: 8px;">${drug.note || '-'}</td>
             </tr>
           `
@@ -134,6 +135,7 @@ const printPrescriptions = () => {
             <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Tên Thuốc</th>
             <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Liều Lượng</th>
             <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Tần Suất</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Số Lượng</th>
             <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Ghi Chú</th>
           </tr>
         </thead>

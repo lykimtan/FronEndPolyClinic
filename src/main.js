@@ -19,7 +19,16 @@ app.use(router);
 const userStore = useUserStore();
 userStore.loadUser();
 
-// Register router guard after Pinia and user are ready
-router.beforeEach(authGuard);
+router.beforeEach((to, from, next) => {
+  const result = authGuard(to);
+  if (result === true) {
+    next();
+  } else {
+    next(result);
+  }
+});
 
-app.mount('#app');
+// Wait for router to be ready before mounting
+router.isReady().then(() => {
+  app.mount('#app');
+});
