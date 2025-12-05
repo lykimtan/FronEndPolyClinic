@@ -126,6 +126,12 @@ const routes = [
         component: () => import('../views/Admin/RoleRequestDetail.vue'),
         meta: { requiresAuth: true, role: 'admin' },
       },
+      {
+        path: 'user-management',
+        name: 'UserManagement',
+        component: () => import('../views/Admin/UserManagement.vue'),
+        meta: { requiresAuth: true, role: 'admin' },
+      },
     ],
   },
 
@@ -195,6 +201,12 @@ const routes = [
         component: () => import('../views/Doctor/FnADoctorView.vue'),
         meta: { requiresAuth: true, role: 'doctor' },
       },
+      {
+        path: 'my-work-schedule',
+        name: 'MyWorkSchedule',
+        component: () => import('../views/Doctor/MyWorkSchedule.vue'),
+        meta: { requiresAuth: true, role: 'doctor' },
+      },
     ],
   },
 
@@ -246,6 +258,13 @@ const routes = [
         path: 'medication-form/:id?',
         name: 'MedicationForm',
         component: () => import('../views/Staff/FormMedication.vue'),
+        meta: { requiresAuth: true, role: 'staff' },
+      },
+      //manual create doctor schedule
+      {
+        path: 'manual-create-doctor-schedule',
+        name: 'ManualCreateDoctorSchedule',
+        component: () => import('../views/Staff/ManualCreateDoctorSchedule.vue'),
         meta: { requiresAuth: true, role: 'staff' },
       },
     ],

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen text-gray-300 flex">
+  <div class="min-h-screen text-gray-300 flex bg-gray-700">
     <!-- Sidebar -->
     <SideBar :current-user="userStore.getUserInfo" :get-avatar-url="getAvatarUrl" />
 

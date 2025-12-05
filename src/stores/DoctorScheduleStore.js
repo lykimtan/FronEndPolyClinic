@@ -27,5 +27,23 @@ export const useDoctorScheduleStore = defineStore('doctorSchedule', {
         this.schedules = [];
       }
     },
+
+    async createDoctorSchedule(scheduleData) {
+      try {
+        const response = await DoctorScheduleService.createDoctorSchedule(scheduleData);
+        console.log('Created schedule:', response);
+        if (response.data) {
+          this.schedules.push(response.data);
+          return response.data;
+        } else if (response._id) {
+          this.schedules.push(response);
+          return response;
+        }
+        return response;
+      } catch (error) {
+        console.error('Error creating schedule:', error);
+        throw error;
+      }
+    },
   },
 });

@@ -72,6 +72,7 @@
                 <option value="syrup">Siro</option>
                 <option value="injection">Tiêm</option>
                 <option value="powder">Bột</option>
+                <option value="lozenge">Viên sủi</option>
               </select>
               <p v-if="errors.form" class="text-red-500 text-sm mt-1">
                 <i class="fa-solid fa-exclamation-circle mr-1"></i>{{ errors.form }}

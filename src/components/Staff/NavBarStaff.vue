@@ -5,7 +5,6 @@ import { useUserStore } from '@/stores/userStore';
 import { toast } from 'vue-sonner';
 //import router
 
-const router = useRouter();
 const userStore = useUserStore();
 const isDrawerOpen = ref(false);
 
@@ -15,18 +14,6 @@ const toggleDrawer = () => {
 
 const closeDrawer = () => {
   isDrawerOpen.value = false;
-};
-
-const handleLogout = async () => {
-  try {
-    await userStore.logout();
-    toast.success('Đăng xuất thành công!');
-    // Use hard navigation to ensure proper cleanup
-    window.location.href = '/login';
-  } catch (error) {
-    console.error('Logout error:', error);
-    toast.error('Đăng xuất thất bại, vui lòng thử lại');
-  }
 };
 
 const props = defineProps({
@@ -71,7 +58,7 @@ const getAvatarUrl = avatar => {
       >
         <button>
           <i class="fa-solid fa-stethoscope mr-2"></i>
-          Quản lý lịch làm việc
+          Quản lý lịch làm việc định kỳ
         </button>
       </router-link>
 
@@ -85,12 +72,15 @@ const getAvatarUrl = avatar => {
         </button>
       </router-link>
 
-      <button
+      <router-link
+        to="/staff/manual-create-doctor-schedule"
         class="flex items-center bg-white text-sky-500 font-medium rounded-full px-5 py-2 hover:bg-sky-600 hover:text-white transition"
       >
-        <i class="fa-solid fa-notes-medical mr-2"></i>
-        Medical Record
-      </button>
+        <button>
+          <i class="fa-solid fa-notes-medical mr-2"></i>
+          Tạo lịch làm việc thủ công
+        </button>
+      </router-link>
       <router-link to="/userProfile">
         <button
           class="flex items-center bg-white text-sky-500 font-medium rounded-full px-5 py-2 hover:bg-sky-600 hover:text-white transition"

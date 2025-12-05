@@ -20,7 +20,27 @@
         </RoleCard>
       </div>
     </div>
-    <div class="bg-gray-800 rounded-xl p-4 shadow-lg">Card 2</div>
+    <router-link
+      to="/quan-ly-nguoi-dung"
+      class="group block bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700/50 cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-750 hover:border-indigo-500/50 hover:shadow-indigo-500/20 hover:shadow-xl hover:-translate-y-1 active:scale-95"
+    >
+      <div class="flex flex-col items-center gap-3">
+        <div
+          class="p-3 rounded-full bg-gray-700/50 group-hover:bg-indigo-500 text-indigo-400 group-hover:text-white transition-colors duration-300"
+        >
+          <i class="fa-solid fa-users-gear text-xl"></i>
+        </div>
+
+        <div class="text-center">
+          <h3 class="text-gray-100 font-semibold text-lg group-hover:text-white">
+            Quản lý người dùng
+          </h3>
+          <p class="text-gray-400 text-xs mt-1 group-hover:text-gray-300">
+            Xem và chỉnh sửa tài khoản
+          </p>
+        </div>
+      </div>
+    </router-link>
     <div class="bg-gray-800 rounded-xl p-4 shadow-lg">Card 3</div>
     <div class="bg-gray-800 rounded-xl p-4 shadow-lg">Card 4</div>
   </div>

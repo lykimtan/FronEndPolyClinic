@@ -68,9 +68,15 @@
                     <i
                       v-for="star in 5"
                       :key="star"
-                      class="fa-solid fa-star text-yellow-300 text-lg"
+                      :class="
+                        star <= Math.round(averageRating)
+                          ? 'fa-solid fa-star text-yellow-300'
+                          : 'fa-solid fa-star text-gray-400'
+                      "
+                      class="text-lg"
                     ></i>
                   </div>
+                  <span class="ml-3 text-lg font-semibold">{{ averageRating }}/5</span>
                 </div>
 
                 <!-- Email -->
@@ -172,34 +178,6 @@
               Diễn đàn FnA
             </h3>
           </div>
-
-          <!-- Card 3: Lịch làm việc của tôi (duplicate) -->
-          <div
-            class="bg-slate-700/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 hover:scale-105 transition-all duration-300 cursor-pointer border-4 border-slate-500 animate-fade-in-up"
-            style="animation-delay: 0.8s"
-            @click="navigateToSchedule"
-          >
-            <div class="flex items-center justify-center mb-4">
-              <i class="fa-solid fa-clock text-6xl text-white"></i>
-            </div>
-            <h3 class="text-3xl font-extrabold text-white text-center uppercase tracking-wider">
-              Lịch làm việc của tôi
-            </h3>
-          </div>
-
-          <!-- Card 4: Lịch làm việc của tôi (duplicate) -->
-          <div
-            class="bg-slate-700/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 hover:scale-105 transition-all duration-300 cursor-pointer border-4 border-slate-500 animate-fade-in-up"
-            style="animation-delay: 0.9s"
-            @click="navigateToSchedule"
-          >
-            <div class="flex items-center justify-center mb-4">
-              <i class="fa-solid fa-calendar-check text-6xl text-white"></i>
-            </div>
-            <h3 class="text-3xl font-extrabold text-white text-center uppercase tracking-wider">
-              Lịch làm việc của tôi
-            </h3>
-          </div>
         </div>
       </div>
     </div>
@@ -208,6 +186,8 @@
 <script setup>
 import { useDoctorStore } from '@/stores/DoctorStore';
 import { useUserStore } from '@/stores/userStore';
+import { useDoctorScheduleStore } from '@/stores/DoctorScheduleStore';
+import { useRatingStore } from '@/stores/RatingStore';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -222,15 +202,12 @@ const getImageUrl = path => {
 const doc = ref({});
 const userStore = useUserStore();
 const doctorStore = useDoctorStore();
+const doctorScheduleStore = useDoctorScheduleStore();
+const ratingStore = useRatingStore();
 
-// Today's schedules - sample data (replace with actual API call)
-const todaySchedules = ref([
-  { time: '08:00 - 08:30', patient: 'Nguyễn Văn A', status: 'completed' },
-  { time: '09:00 - 09:30', patient: 'Trần Thị B', status: 'completed' },
-  { time: '10:00 - 10:30', patient: 'Lê Văn C', status: 'pending' },
-  { time: '14:00 - 14:30', patient: 'Phạm Thị D', status: 'pending' },
-  { time: '15:30 - 16:00', patient: 'Hoàng Văn E', status: 'pending' },
-]);
+// Today's schedules
+const todaySchedules = ref([]);
+const averageRating = ref(0);
 
 // Format today's date
 const formatToday = () => {
@@ -239,27 +216,84 @@ const formatToday = () => {
   return today.toLocaleDateString('vi-VN', options);
 };
 
+// Get today's date in YYYY-MM-DD format for comparison
+const getTodayDateString = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// Format time from schedule
+const formatSlotTime = slot => {
+  if (!slot || !slot.startTime || !slot.endTime) return '';
+  return `${slot.startTime} - ${slot.endTime}`;
+};
+
 onMounted(async () => {
   await userStore.fetchUserProfile();
-  console.log('📄 Fetched doctor Profile in this:', userStore.getUserInfo);
+  console.log('Fetched doctor Profile in this:', userStore.getUserInfo);
   const doctorId = userStore.getUserInfo.id;
   console.log('Doctor ID:', doctorId);
   const docRes = await doctorStore.getDoctorById(doctorId);
   console.log('Fetched doctor data:', docRes);
   doc.value = docRes?.data || docRes;
 
-  // TODO: Fetch today's schedules from API
-  // const schedules = await fetchTodaySchedules(doctorId);
-  // todaySchedules.value = schedules;
+  // Fetch average rating
+  try {
+    await ratingStore.fetchRatingsByDoctor(doctorId);
+    const ratings = ratingStore.ratings;
+    if (ratings && ratings.length > 0) {
+      const sum = ratings.reduce((acc, rating) => acc + rating.score, 0);
+      averageRating.value = (sum / ratings.length).toFixed(1);
+    } else {
+      averageRating.value = 0;
+    }
+    console.log('Average rating:', averageRating.value);
+  } catch (error) {
+    console.error('Error fetching ratings:', error);
+    averageRating.value = 0;
+  }
+
+  // Fetch today's schedules from store
+  try {
+    const schedules = await doctorScheduleStore.fetchSchedulesByDoctorId(doctorId);
+    console.log('Fetched schedules:', schedules);
+
+    if (schedules && schedules.length > 0) {
+      const todayDateStr = getTodayDateString();
+      const today = schedules
+        .filter(schedule => {
+          const scheduleDate = new Date(schedule.date).toISOString().split('T')[0];
+          return scheduleDate === todayDateStr;
+        })
+        .flatMap(schedule =>
+          schedule.availableSlots.map(slot => ({
+            time: formatSlotTime(slot),
+            patient: 'Chưa cập nhật', // Will be updated from appointment data
+            status: slot.isBooked ? 'pending' : 'available',
+            slotId: slot._id,
+            scheduleId: schedule._id,
+          }))
+        );
+
+      todaySchedules.value = today;
+      console.log('Today schedules:', todaySchedules.value);
+    }
+  } catch (error) {
+    console.error('Error fetching schedules:', error);
+    todaySchedules.value = [];
+  }
 });
 
 // Navigation functions
 const navigateToSchedule = () => {
-  router.push('/doctor/schedule');
+  router.push('/doctor/my-work-schedule');
 };
 
 const navigateToFnA = () => {
-  router.push('/fna');
+  router.push({ name: 'DoctorFnAQuestions' });
 };
 </script>
 

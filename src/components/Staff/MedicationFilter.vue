@@ -46,6 +46,7 @@
           <option value="injection">Tiêm</option>
           <option value="cream">Mỡ/Kem</option>
           <option value="powder">Bột</option>
+          <option value="lozenge">Viên sủi</option>
         </select>
       </div>
 

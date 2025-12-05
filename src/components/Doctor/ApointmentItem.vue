@@ -97,7 +97,11 @@
 
     <!-- Action Button -->
     <button
-      v-if="appointment.status !== 'completed'"
+      v-if="
+        appointment.status !== 'completed' &&
+        appointment.status !== 'cancelled' &&
+        appointment.status !== 'pending'
+      "
       class="w-full py-3.5 bg-white/95 text-indigo-600 rounded-xl text-base font-bold shadow-lg transition-all hover:bg-white hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0"
       @click="handleStartWork"
     >

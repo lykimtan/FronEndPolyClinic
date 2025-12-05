@@ -60,7 +60,7 @@ import AppointmentItem from '@/components/Doctor/ApointmentItem.vue';
 
 const appointmentStore = useAppointmentStore();
 const appointmentsToday = ref([]);
-const today = new Date().toISOString().split('T')[0];
+const today = new Date().toLocaleDateString('en-CA');
 const router = useRouter();
 const formatDateHeader = dateString => {
   const date = new Date(dateString);
@@ -82,7 +82,7 @@ const handleDetailMedicalRecord = appointment => {
 
 onMounted(async () => {
   try {
-    appointmentsToday.value = await appointmentStore.fetchAllAppointmentsByDate('2025-12-6');
+    appointmentsToday.value = await appointmentStore.fetchAllAppointmentsByDate(today);
 
     // Sắp xếp: non-completed ở trên (theo time), completed ở dưới (theo time)
     appointmentsToday.value.sort((a, b) => {
