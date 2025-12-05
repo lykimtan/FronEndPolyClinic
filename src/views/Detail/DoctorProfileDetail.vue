@@ -6,79 +6,226 @@
       <p class="mt-4 text-gray-600 text-lg">Đang tải thông tin bác sĩ...</p>
     </div>
 
-    <div v-else class="bg-white shadow-lg rounded-3xl w-full overflow-hidden">
-      <!-- Header -->
-      <div class="text-center p-6 border-b border-gray-200">
-        <h2 class="text-3xl font-bold text-blue-700 tracking-wide">Thông tin bác sĩ</h2>
+    <div
+      v-else
+      class="bg-white shadow-xl rounded-3xl w-full overflow-hidden border border-slate-100"
+    >
+      <div class="h-48 bg-gradient-to-r from-blue-600 to-cyan-500 relative">
+        <div
+          class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/medical-icons.png')]"
+        ></div>
+      </div>
 
-        <!-- Avatar -->
-        <div class="relative mt-4 flex justify-center">
+      <div class="px-6 relative text-center">
+        <div class="relative -mt-20 inline-block">
+          <div class="relative w-60 h-60 rounded-full p-1 bg-white shadow-lg mx-auto">
+            <div class="w-full h-full rounded-full overflow-hidden relative">
+              <img
+                :src="getImageUrl(doc.avatar)"
+                alt="Doctor Avatar"
+                class="w-full h-full object-cover transform hover:scale-110 transition duration-500"
+              />
+            </div>
+          </div>
+
           <div
-            class="relative w-100 h-100 rounded-full border-[20px] border-blue-600 overflow-hidden"
+            class="absolute bottom-2 right-2 w-10 h-10 bg-white rounded-full p-1.5 shadow-md flex items-center justify-center"
+            title="HealthMate Verified"
           >
             <img
-              :src="getImageUrl(doc.avatar)"
-              alt="Doctor Avatar"
-              class="w-full h-full object-cover"
+              src="./../../assets/HealthCare.png"
+              alt="Logo"
+              class="w-full h-full object-contain"
             />
-          </div>
-          <div class="absolute w-20 h-20 -bottom-[20px]">
-            <img src="./../../assets/HealthCareWhite.png" alt="" />
           </div>
         </div>
 
-        <h3 class="mt-4 text-2xl font-bold text-gray-800">DR. {{ doc.fullName }}</h3>
+        <div class="mt-4 mb-8">
+          <h2 class="text-3xl font-bold text-slate-800 tracking-tight">Dr. {{ doc.fullName }}</h2>
+          <div class="flex items-center justify-center gap-2 mt-1">
+            <span
+              class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium border border-blue-100"
+            >
+              {{ doc.specializationIds.map(spec => spec.name).join(', ') }}
+            </span>
+          </div>
+        </div>
       </div>
 
-      <!-- Content -->
-      <div class="flex justify-center bg-gray-50 py-6">
-        <div
-          class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 bg-white shadow-md rounded-2xl max-w-6xl w-full"
-        >
-          <!-- Personal Info -->
-          <div class="p-6 animate-slide-in-left" :class="{ 'opacity-0': !isLoaded }">
-            <h4 class="text-gray-900 text-lg font-semibold mb-3">Thông tin cá nhân</h4>
-            <ul class="space-y-2 text-gray-600 text-sm md:text-base">
-              <li><span class="font-medium">Full Name:</span> {{ doc.fullName }}</li>
-              <li>
-                <span class="font-medium">Date of Birth:</span> {{ formatDate(doc.dateOfBirth) }}
-              </li>
-              <li>
-                <span class="font-medium">Specialization:</span>
-                {{ doc.specializationIds.map(spec => spec.name).join(', ') }}
-              </li>
-              <li><span class="font-medium">Kinh nghiệm:</span> {{ doc.yearsOfExperience }} năm</li>
-              <li><span class="font-medium">Giấy phép hành nghề:</span> {{ doc.licenseNumber }}</li>
-            </ul>
+      <div class="px-6 pb-8 md:px-10">
+        <div class="grid md:grid-cols-2 gap-6 md:gap-10">
+          <div class="animate-slide-in-left" :class="{ 'opacity-0': !isLoaded }">
+            <h4 class="flex items-center text-slate-800 text-lg font-bold mb-5 border-b pb-2">
+              <svg
+                class="w-5 h-5 mr-2 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                ></path>
+              </svg>
+              Thông tin cá nhân
+            </h4>
+
+            <div class="space-y-4">
+              <div class="flex items-start group">
+                <div
+                  class="min-w-[140px] text-slate-400 text-sm font-medium uppercase tracking-wider"
+                >
+                  Họ và tên
+                </div>
+                <div class="font-medium text-slate-700">{{ doc.fullName }}</div>
+              </div>
+              <div class="flex items-start group">
+                <div
+                  class="min-w-[140px] text-slate-400 text-sm font-medium uppercase tracking-wider"
+                >
+                  Ngày sinh
+                </div>
+                <div class="font-medium text-slate-700">{{ formatDate(doc.dateOfBirth) }}</div>
+              </div>
+              <div class="flex items-start group">
+                <div
+                  class="min-w-[140px] text-slate-400 text-sm font-medium uppercase tracking-wider"
+                >
+                  Kinh nghiệm
+                </div>
+                <div class="font-medium text-slate-700 flex items-center">
+                  <span class="text-blue-600 font-bold text-lg mr-1">{{
+                    doc.yearsOfExperience
+                  }}</span>
+                  năm
+                </div>
+              </div>
+              <div class="flex items-start group">
+                <div
+                  class="min-w-[140px] text-slate-400 text-sm font-medium uppercase tracking-wider"
+                >
+                  Giấy phép
+                </div>
+                <div
+                  class="font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-sm font-mono border border-slate-200"
+                >
+                  {{ doc.licenseNumber }}
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Record -->
-          <div class="p-6 animate-slide-in-right" :class="{ 'opacity-0': !isLoaded }">
-            <h4 class="text-gray-700 font-semibold mb-3 text-lg">
-              Quá trình công tác tại phòng khám
+          <div class="animate-slide-in-right" :class="{ 'opacity-0': !isLoaded }">
+            <h4 class="flex items-center text-slate-800 text-lg font-bold mb-5 border-b pb-2">
+              <svg
+                class="w-5 h-5 mr-2 text-yellow-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                ></path>
+              </svg>
+              Hiệu suất làm việc
             </h4>
-            <ul class="space-y-3 text-gray-600 text-sm md:text-base">
-              <li><span class="font-medium">Tổng số lượt khám:</span> {{ 20 }}</li>
-              <li>
-                <span class="font-medium">Đánh giá trung bình:</span>
-                <div class="flex items-center mt-1 space-x-1">
+
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div class="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
+                <div class="text-3xl font-extrabold text-blue-600 mb-1">20</div>
+                <div class="text-xs text-blue-400 font-medium uppercase">Lượt khám</div>
+              </div>
+              <div class="bg-yellow-50 rounded-2xl p-4 text-center border border-yellow-100">
+                <div class="text-3xl font-extrabold text-yellow-600 mb-1">{{ averageRating }}</div>
+                <div class="text-xs text-yellow-500 font-medium uppercase">Điểm đánh giá</div>
+              </div>
+            </div>
+
+            <div
+              class="bg-slate-50 rounded-xl p-4 flex flex-col items-center justify-center border border-slate-100"
+            >
+              <div class="flex items-center space-x-1 mb-2">
+                <template v-for="n in 5" :key="n">
+                  <i class="fa-solid fa-star text-yellow-400 text-2xl"></i>
+                </template>
+              </div>
+              <p class="text-slate-500 text-sm">
+                Dựa trên <span class="font-bold text-slate-700">{{ ratings.length }}</span> lượt
+                phản hồi từ bệnh nhân
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Ratings Section -->
+      <div class="p-8 bg-white">
+        <h4 class="text-2xl font-bold text-gray-800 mb-6">
+          Đánh giá từ bệnh nhân ({{ ratings.length }})
+        </h4>
+
+        <!-- No ratings message -->
+        <div v-if="ratings.length === 0" class="text-center py-12">
+          <i class="fa-solid fa-star text-gray-300 text-4xl mb-3"></i>
+          <p class="text-gray-500 text-lg">Chưa có đánh giá nào</p>
+        </div>
+
+        <!-- Ratings list -->
+        <div v-else class="space-y-6">
+          <div
+            v-for="rating in ratings"
+            :key="rating._id"
+            class="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow"
+          >
+            <!-- Rating header with stars and score -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center space-x-3">
+                <img
+                  v-if="rating.patientId?.avatar"
+                  :src="getImageUrl(rating.patientId.avatar)"
+                  alt="Patient Avatar"
+                  class="w-10 h-10 rounded-full object-cover"
+                />
+                <div
+                  v-else
+                  class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center"
+                >
+                  <i class="fa-solid fa-user text-gray-500"></i>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-800">
+                    {{ rating.patientId?.firstName }} {{ rating.patientId?.lastName }}
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    {{
+                      new Date(rating.createdAt).toLocaleDateString('vi-VN', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      })
+                    }}
+                  </p>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center space-x-1 mb-1 justify-end">
                   <template v-for="n in 5" :key="n">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5"
-                      :class="n <= Math.round(0) ? 'text-yellow-400' : 'text-gray-300'"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.964a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.382 2.457a1 1 0 00-.364 1.118l1.287 3.965c.3.921-.755 1.688-1.54 1.118l-3.383-2.457a1 1 0 00-1.175 0l-3.383 2.457c-.784.57-1.838-.197-1.539-1.118l1.287-3.965a1 1 0 00-.364-1.118L2.05 9.391c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.964z"
-                      />
-                    </svg>
+                    <i class="fa-solid fa-star text-yellow-400 text-xl"></i>
                   </template>
                 </div>
-                <p class="text-gray-700 font-medium mt-0.5">0/5</p>
-              </li>
-            </ul>
+                <p class="text-sm font-semibold text-gray-700">{{ rating.score }}/5</p>
+              </div>
+            </div>
+
+            <!-- Rating comment -->
+            <p v-if="rating.comment" class="text-gray-700 leading-relaxed">
+              {{ rating.comment }}
+            </p>
+            <p v-else class="text-gray-500 italic">Không có bình luận</p>
           </div>
         </div>
       </div>
@@ -90,9 +237,11 @@
 import { useDoctorStore } from '@/stores/DoctorStore';
 import { useRoute } from 'vue-router';
 import { ref, onMounted } from 'vue';
+import { useRatingStore } from '@/stores/RatingStore';
 
 const doctorStore = useDoctorStore();
 const route = useRoute();
+const ratingStore = useRatingStore();
 
 const getImageUrl = path => {
   if (!path) return '/src/assets/images/specilization/DefaultSpec.jpg';
@@ -102,12 +251,32 @@ const getImageUrl = path => {
 
 const isLoaded = ref(false);
 const doc = ref({});
+const ratings = ref([]);
+const averageRating = ref(0);
+
+const getAverageRating = () => {
+  if (ratings.value.length === 0) return 0;
+  const sum = ratings.value.reduce((acc, rating) => acc + rating.score, 0);
+  return (sum / ratings.value.length).toFixed(1);
+};
 
 onMounted(async () => {
   const doctorId = route.params.id;
   const docRes = await doctorStore.getDoctorById(doctorId);
   console.log('Fetched doctor data:', docRes);
   doc.value = docRes?.data || docRes;
+
+  // Fetch ratings for this doctor
+  try {
+    await ratingStore.fetchRatingsByDoctor(doctorId);
+    ratings.value = ratingStore.ratings;
+    averageRating.value = getAverageRating();
+  } catch (error) {
+    console.error('Error fetching ratings:', error);
+    ratings.value = [];
+    averageRating.value = 0;
+  }
+
   setTimeout(() => {
     isLoaded.value = true;
   }, 1000);

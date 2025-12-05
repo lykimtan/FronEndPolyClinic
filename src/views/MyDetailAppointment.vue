@@ -33,7 +33,7 @@
         />
 
         <!-- Rating Component -->
-        <DoctorRatingCard :appointment="appointment" />
+        <DoctorRatingCard v-if="appointment.status == 'completed'" :appointment="appointment" />
       </div>
     </div>
 
@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAppointmentStore } from '@/stores/appointmentStore';
 import DoctorInfoCard from '@/components/Patient/DoctorInfoCard.vue';
@@ -186,4 +186,14 @@ async function handleDeleteAppointment(appointmentId) {
 onMounted(async () => {
   await fetchAppointmentDetails();
 });
+
+// Watch for route param changes to refetch appointment details
+watch(
+  () => route.params.id,
+  async appointmentId => {
+    if (appointmentId) {
+      await fetchAppointmentDetails();
+    }
+  }
+);
 </script>

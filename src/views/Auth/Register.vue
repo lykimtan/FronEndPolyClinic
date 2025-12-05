@@ -132,8 +132,8 @@
         class="relative z-20 bg-[#6B8BFF] text-white flex flex-col justify-center items-center p-10 md:w-1/2 md:rounded-l-[100px]"
       >
         <img class="w-40" src="../../assets/HealthCare.png" alt="" />
-        <h2 class="text-3xl font-bold mb-2">Hello, Welcome!</h2>
-        <p class="text-white/80 mb-6">Do you have an account?</p>
+        <h2 class="text-3xl font-bold mb-2">HealthMate xin chào</h2>
+        <p class="text-white/80 mb-6">Bạn đã có tài khoản?</p>
         <router-link to="/login">
           <button
             class="border-2 border-white px-6 py-2 rounded-full hover:bg-white hover:text-[#6B8BFF] transition"

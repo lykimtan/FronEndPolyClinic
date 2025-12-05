@@ -21,7 +21,8 @@ const handleLogout = async () => {
   try {
     await userStore.logout();
     toast.success('Đăng xuất thành công!');
-    router.push('/login');
+    // Use hard navigation to ensure proper cleanup
+    window.location.href = '/login';
   } catch (error) {
     console.error('Logout error:', error);
     toast.error('Đăng xuất thất bại, vui lòng thử lại');

@@ -19,7 +19,7 @@ const storeSpecialization = useSpecializationStore();
 
 onMounted(async () => {
   await userStore.fetchUserProfile();
-  console.log('📄 Fetched user profile:', userStore.getUserInfo);
+  console.log('Fetched user profile:', userStore.getUserInfo);
   await storeSpecialization.fetchSpecializations();
   console.log('Specializations fetched in HomeView: ', storeSpecialization.getAll);
 });

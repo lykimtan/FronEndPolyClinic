@@ -9,19 +9,29 @@ import HeaderPartStaff from '@/components/Staff/HeaderStaff.vue';
 import HeaderPart from '@/components/HeaderPart.vue';
 import { useUserStore } from '@/stores/userStore';
 import { useRouter } from 'vue-router';
-import { onMounted } from 'vue';
+import { onMounted, watch, computed } from 'vue';
 
 const userStore = useUserStore();
 const router = useRouter();
 
-const userInfo = userStore.getUserInfo;
+const userInfo = computed(() => userStore.getUserInfo);
 
 // Redirect to login if not authenticated
 onMounted(() => {
-  if (!userInfo) {
+  if (!userInfo.value) {
     router.push({ name: 'Login' });
   }
 });
+
+// Watch for logout (when userInfo becomes null)
+watch(
+  () => userStore.isLoggedIn,
+  isLoggedIn => {
+    if (!isLoggedIn) {
+      router.push({ name: 'Login' });
+    }
+  }
+);
 </script>
 
 <template>

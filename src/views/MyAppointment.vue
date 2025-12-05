@@ -298,15 +298,48 @@ function formatCreatedDate(dateString) {
 }
 
 async function cancelAppointment(appointmentId) {
-  if (confirm('Bạn có chắc chắn muốn hủy lịch hẹn này?')) {
-    try {
-      await appointmentStore.updateAppointmentStatus(appointmentId, 'cancelled');
-      // Refresh appointments
-      await fetchAppointments();
-    } catch (error) {
-      console.error('Error canceling appointment:', error);
-      alert('Có lỗi xảy ra khi hủy lịch hẹn');
-    }
+  const result = await Swal.fire({
+    title: 'Bạn có chắc chắn?',
+    text: 'Bạn muốn hủy lịch hẹn này. Hành động này có thể được hoàn tác.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#3b82f6',
+    confirmButtonText: 'Vâng, hủy nó!',
+    cancelButtonText: 'Không, giữ lại',
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    Swal.fire({
+      title: 'Đang xử lý...',
+      text: 'Vui lòng chờ trong giây lát',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    await appointmentStore.updateAppointmentStatus(appointmentId, 'cancelled');
+    await fetchAppointments();
+
+    Swal.fire({
+      title: 'Đã hủy!',
+      text: 'Lịch hẹn đã được hủy thành công.',
+      icon: 'success',
+      timer: 1500,
+      showConfirmButton: false,
+    });
+  } catch (error) {
+    console.error('Error canceling appointment:', error);
+
+    Swal.fire({
+      title: 'Lỗi!',
+      text: error.message || 'Có lỗi xảy ra khi hủy lịch hẹn.',
+      icon: 'error',
+      confirmButtonText: 'Đóng',
+    });
   }
 }
 

@@ -14,13 +14,13 @@
       <div
         class="relative z-20 bg-[#6B8BFF] text-white flex flex-col justify-center items-center p-10 md:w-1/2 rounded-r-[100px]"
       >
-        <h2 class="text-3xl font-bold mb-2">Hello, Welcome Back!</h2>
-        <p class="text-white/80 mb-6">Don't have an account?</p>
+        <h2 class="text-3xl font-bold mb-2">Chào mừng trở lại</h2>
+        <p class="text-white/80 mb-6">Bạn chưa có tài khoản?</p>
         <router-link to="/register">
           <button
             class="border-2 border-white px-6 py-2 rounded-full hover:bg-white hover:text-[#6B8BFF] transition"
           >
-            Register
+            Đăng ký
           </button>
         </router-link>
       </div>
@@ -61,18 +61,16 @@
             </button>
           </div>
 
-          <div class="text-right">
-            <a href="#" class="text-sm text-[#6B8BFF] hover:underline">Forgot Password?</a>
-          </div>
-
           <button
             class="w-full bg-[#6B8BFF] text-white py-3 rounded-lg hover:bg-[#5670d4] transition"
             type="submit"
           >
-            Login
+            Đăng nhập
           </button>
 
-          <div class="text-center text-gray-500 text-sm mt-4">or login with social platforms</div>
+          <div class="text-center text-gray-500 text-sm mt-4">
+            hoặc đăng nhập bằng các nền tảng xã hội
+          </div>
 
           <div class="flex justify-center space-x-4 mt-2">
             <div id="google-btn" class="w-full flex justify-center"></div>

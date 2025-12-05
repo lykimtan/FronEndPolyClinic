@@ -81,6 +81,11 @@ const routes = [
         name: 'FnAForum',
         component: () => import('../views/FnAForum.vue'),
       },
+      {
+        path: '/notifications',
+        name: 'Notifications',
+        component: () => import('../views/NotificationsView.vue'),
+      },
     ],
   },
 

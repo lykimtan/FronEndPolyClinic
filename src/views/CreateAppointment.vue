@@ -191,7 +191,7 @@ const selectedSlot = ref(null);
 
 // Load data on mount
 onMounted(async () => {
-  console.log('📋 Query params:', route.query);
+  console.log('Query params:', route.query);
 
   if (!doctorId.value || !scheduleId.value || !slotId.value) {
     errorMessage.value = 'Thiếu thông tin đặt lịch. Vui lòng chọn lại.';
@@ -215,11 +215,11 @@ onMounted(async () => {
       );
     }
 
-    console.log('✅ Doctor info:', doctorInfo.value);
-    console.log('✅ Schedule info:', scheduleInfo.value);
-    console.log('✅ Selected slot:', selectedSlot.value);
+    console.log('Doctor info:', doctorInfo.value);
+    console.log(' Schedule info:', scheduleInfo.value);
+    console.log(' Selected slot:', selectedSlot.value);
   } catch (error) {
-    console.error('❌ Error loading data:', error);
+    console.error('Error loading data:', error);
     errorMessage.value = 'Không thể tải thông tin. Vui lòng thử lại.';
   }
 });
@@ -271,21 +271,21 @@ const handleSubmit = async () => {
       notes: formData.value.notes.trim(),
     };
 
-    console.log('📤 Submitting appointment:', appointmentData);
+    console.log('Submitting appointment:', appointmentData);
 
     const result = await appointmentStore.createAppointment(appointmentData);
 
-    console.log('✅ Appointment created:', result);
+    console.log('Appointment created:', result);
 
     successMessage.value = 'Đặt lịch thành công!';
     toast.success('Đặt lịch khám thành công!');
 
     // Redirect after 2 seconds
     setTimeout(() => {
-      router.push({ name: 'Home' });
+      router.push({ name: 'MyAppointments' });
     }, 2000);
   } catch (error) {
-    console.error('❌ Error creating appointment:', error);
+    console.error('Error creating appointment:', error);
     errorMessage.value = error.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
     toast.error('Đặt lịch thất bại');
   } finally {

@@ -1,11 +1,8 @@
 <script setup>
 import { ref, defineProps } from 'vue';
-import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 import { toast } from 'vue-sonner';
-//import router
-
-const router = useRouter();
+import NotificationBell from '@/components/NotificationBell.vue';
 const userStore = useUserStore();
 const isDrawerOpen = ref(false);
 
@@ -21,7 +18,8 @@ const handleLogout = async () => {
   try {
     await userStore.logout();
     toast.success('Đăng xuất thành công!');
-    router.push('/login');
+    // Use hard navigation to ensure proper cleanup
+    window.location.href = '/login';
   } catch (error) {
     console.error('Logout error:', error);
     toast.error('Đăng xuất thất bại, vui lòng thử lại');
@@ -61,6 +59,11 @@ const getAvatarUrl = avatar => {
       <i class="fa-solid fa-bars"></i>
     </button>
 
+    <!-- Mobile Notification Bell -->
+    <div class="md:hidden" data-notification-bell>
+      <NotificationBell />
+    </div>
+
     <!-- Navigation Buttons  -->
     <div class="hidden md:flex space-x-4">
       <router-link
@@ -92,6 +95,9 @@ const getAvatarUrl = avatar => {
           Hồ sơ bệnh án
         </button>
       </router-link>
+
+      <!-- Notification Bell -->
+
       <router-link to="/userProfile">
         <button
           class="flex items-center bg-sky-500 text-white font-medium rounded-full px-5 py-2 hover:bg-sky-600 transition"
@@ -104,6 +110,9 @@ const getAvatarUrl = avatar => {
           {{ props.userInfo?.fullName || props.userInfo?.firstName || 'My Account' }}
         </button>
       </router-link>
+      <div data-notification-bell class="mt-3">
+        <NotificationBell />
+      </div>
     </div>
   </nav>
 

@@ -1,7 +1,6 @@
 <script setup>
 import { ref, defineProps } from 'vue';
-
-//import router
+import NotificationBell from '@/components/NotificationBell.vue';
 
 const isDrawerOpen = ref(false);
 
@@ -46,6 +45,11 @@ const getAvatarUrl = avatar => {
       <i class="fa-solid fa-bars"></i>
     </button>
 
+    <!-- Mobile Notification Bell -->
+    <div class="md:hidden" data-notification-bell>
+      <NotificationBell />
+    </div>
+
     <!-- Navigation Buttons  -->
 
     <div class="hidden md:flex space-x-4">
@@ -87,6 +91,9 @@ const getAvatarUrl = avatar => {
           {{ props.userInfo?.fullName || props.userInfo?.firstName || 'My Account' }}
         </button>
       </router-link>
+      <div data-notification-bell class="mt-3">
+        <NotificationBell />
+      </div>
     </div>
   </nav>
 
