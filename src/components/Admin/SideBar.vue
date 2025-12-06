@@ -16,6 +16,17 @@
     </h2>
 
     <div class="mt-8 space-y-3">
+      <router-link to="/admin/dashboard">
+        <div
+          class="group flex items-center gap-3 w-full py-3 px-4 rounded-lg text-sm font-medium text-slate-300 hover:text-white bg-transparent hover:bg-blue-600 cursor-pointer transition-all duration-200"
+        >
+          <i
+            class="fa-brands fa-black-tie w-6 text-center group-hover:scale-110 transition-transform"
+          ></i>
+
+          <span>DASHBOARD</span>
+        </div>
+      </router-link>
       <router-link to="/admin/user-management">
         <div
           class="group flex items-center gap-3 w-full py-3 px-4 rounded-lg text-sm font-medium text-slate-300 hover:text-white bg-transparent hover:bg-blue-600 cursor-pointer transition-all duration-200"

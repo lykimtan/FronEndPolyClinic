@@ -184,6 +184,13 @@ const routes = [
       },
 
       {
+        path: 'medical-record/:id/edit',
+        name: 'EditMedicalRecord',
+        component: () => import('../views/Doctor/EditMedicalRecord.vue'),
+        meta: { requiresAuth: true, role: 'doctor' },
+      },
+
+      {
         path: 'prescribed-medication-form/:medicalRecordId',
         name: 'FormPrescribedMedication',
         component: () => import('../views/Doctor/PrecribedMedicationForm.vue'),

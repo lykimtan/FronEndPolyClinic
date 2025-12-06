@@ -76,7 +76,7 @@
       </div>
 
       <!-- Follow-up -->
-      <div>
+      <div class="border-b pb-6">
         <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
           <i class="fa-solid fa-calendar-check text-green-500"></i>
           Tái Khám
@@ -93,6 +93,32 @@
             <span class="font-semibold">Ngày tái khám:</span>
             <span class="ml-2">{{ formatDate(medicalRecord.followUpDate) }}</span>
           </p>
+        </div>
+      </div>
+
+      <!-- Record Timeline -->
+      <div>
+        <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-clock text-indigo-500"></i>
+          Lịch Sử Hồ Sơ
+        </h3>
+        <div class="space-y-3">
+          <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+            <p class="text-gray-700 flex justify-between items-center">
+              <span class="font-semibold">Ngày tạo:</span>
+              <span class="text-indigo-600 font-medium">{{
+                formatDateTime(medicalRecord.createdAt)
+              }}</span>
+            </p>
+          </div>
+          <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <p class="text-gray-700 flex justify-between items-center">
+              <span class="font-semibold">Cập nhật lần cuối:</span>
+              <span class="text-blue-600 font-medium">{{
+                formatDateTime(medicalRecord.updatedAt)
+              }}</span>
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -115,5 +141,21 @@ const formatDate = dateString => {
     month: 'long',
     day: 'numeric',
   });
+};
+
+const formatDateTime = dateString => {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  const dateStr = date.toLocaleDateString('vi-VN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const timeStr = date.toLocaleTimeString('vi-VN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+  return `${dateStr} ${timeStr}`;
 };
 </script>

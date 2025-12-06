@@ -51,18 +51,38 @@ export const useAdminUserStore = defineStore('adminUser', () => {
       const params = {
         page: filters.page || pagination.value.page,
         limit: filters.limit || pagination.value.limit,
-        ...filters,
       };
+
+      // Preserve role filter
+      if (filters.role !== undefined) {
+        params.role = filters.role;
+      } else if (currentRole.value) {
+        params.role = currentRole.value;
+      }
+
+      // Preserve search query
+      if (filters.search !== undefined) {
+        params.search = filters.search;
+      } else if (searchQuery.value) {
+        params.search = searchQuery.value;
+      }
 
       const response = await userService.getAllUsers(params);
 
       // Backend returns data: { users }, not data as array
       users.value = response.data?.users || response.data || [];
       pagination.value = {
-        page: params.page,
-        limit: params.limit,
-        total: response.total || 0,
+        page: params.page || 1,
+        limit: params.limit || 10,
+        total:
+          response.pagination?.total ||
+          response.data?.total ||
+          response.total ||
+          users.value.length,
       };
+
+      console.log('Pagination updated:', pagination.value);
+      console.log('Fetched params:', params);
 
       return response;
     } catch (error) {

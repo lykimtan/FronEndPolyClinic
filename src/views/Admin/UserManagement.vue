@@ -28,7 +28,9 @@
         class="mt-8 flex justify-between items-center"
       >
         <p class="text-gray-600">
-          Tổng: <span class="font-bold">{{ pagination.total }}</span> người dùng
+          Tổng: <span class="font-bold">{{ pagination.total }}</span> người dùng | Trang
+          <span class="font-bold">{{ pagination.page }}</span> /
+          <span class="font-bold">{{ Math.ceil(pagination.total / pagination.limit) }}</span>
         </p>
         <div class="flex gap-3">
           <button
@@ -98,13 +100,13 @@ const handleToggleStatus = async userId => {
 };
 
 const previousPage = async () => {
-  const newPage = Math.max(1, pagination.page - 1);
+  const newPage = Math.max(1, pagination.value.page - 1);
   await fetchUsers({ page: newPage });
 };
 
 const nextPage = async () => {
-  const maxPage = Math.ceil(pagination.total / pagination.limit);
-  const newPage = Math.min(maxPage, pagination.page + 1);
+  const maxPage = Math.ceil(pagination.value.total / pagination.value.limit);
+  const newPage = Math.min(maxPage, pagination.value.page + 1);
   await fetchUsers({ page: newPage });
 };
 

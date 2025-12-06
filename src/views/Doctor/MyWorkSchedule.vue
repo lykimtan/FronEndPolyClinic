@@ -9,12 +9,39 @@
 
       <!-- Controls -->
       <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <ScheduleControls
-          :current-date="currentDate"
-          @previous-month="previousMonth"
-          @next-month="nextMonth"
-          @go-today="goToToday"
-        />
+        <div class="space-y-4">
+          <!-- Row 1: Month Controls -->
+          <div>
+            <ScheduleControls
+              :current-date="currentDate"
+              @previous-month="previousMonth"
+              @next-month="nextMonth"
+              @go-today="goToToday"
+            />
+          </div>
+
+          <!-- Row 2: Date Filter -->
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fa-solid fa-calendar-days mr-2"></i>Lọc theo ngày
+              </label>
+              <input
+                v-model="selectedDate"
+                type="date"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div class="flex flex-col justify-end">
+              <button
+                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors font-medium"
+                @click="clearDateFilter"
+              >
+                <i class="fa-solid fa-times mr-2"></i>Xóa bộ lọc
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Schedule List -->
@@ -93,18 +120,30 @@ const doctorScheduleStore = useDoctorScheduleStore();
 const schedules = ref([]);
 const isLoading = ref(false);
 const currentDate = ref(new Date());
+const selectedDate = ref('');
 
 // Computed properties
 const filteredSchedules = computed(() => {
-  return schedules.value
-    .filter(schedule => {
-      const scheduleDate = new Date(schedule.date);
-      return (
-        scheduleDate.getMonth() === currentDate.value.getMonth() &&
-        scheduleDate.getFullYear() === currentDate.value.getFullYear()
-      );
-    })
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
+  let filtered = schedules.value;
+
+  // Filter by month/year
+  filtered = filtered.filter(schedule => {
+    const scheduleDate = new Date(schedule.date);
+    return (
+      scheduleDate.getMonth() === currentDate.value.getMonth() &&
+      scheduleDate.getFullYear() === currentDate.value.getFullYear()
+    );
+  });
+
+  // Filter by specific date if selected
+  if (selectedDate.value) {
+    filtered = filtered.filter(schedule => {
+      const scheduleDate = new Date(schedule.date).toISOString().split('T')[0];
+      return scheduleDate === selectedDate.value;
+    });
+  }
+
+  return filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
 });
 
 const totalAvailableSlots = computed(() => {
@@ -132,6 +171,10 @@ const nextMonth = () => {
 
 const goToToday = () => {
   currentDate.value = new Date();
+};
+
+const clearDateFilter = () => {
+  selectedDate.value = '';
 };
 
 // Fetch schedules on mount

@@ -203,13 +203,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useMedicalRecordStore } from '@/stores/MedicalRecordStore';
 import { useMedicationStore } from '@/stores/MedicationStore';
 import { usePrescribedMedicationStore } from '@/stores/PrescribedMedicationStore';
 import Swal from 'sweetalert2';
 
 const route = useRoute();
+const router = useRouter();
 const medicalRecordStore = useMedicalRecordStore();
 const medicationStore = useMedicationStore();
 const prescribedMedicationStore = usePrescribedMedicationStore();
@@ -384,6 +385,8 @@ const handleSubmit = async () => {
         title: 'Thành công!',
         text: 'Tạo đơn thuốc thành công',
         icon: 'success',
+      }).then(() => {
+        router.push(`/doctor/medical-record/${medicalRecordId.value}`);
       });
 
       resetForm();

@@ -40,7 +40,7 @@
             >
               <!-- Title -->
               <h3 class="text-3xl font-extrabold text-white mb-6 uppercase tracking-wider">
-                My Information
+                Thông tin của tôi
               </h3>
 
               <!-- Information Items -->
@@ -180,6 +180,11 @@
           </div>
         </div>
       </div>
+
+      <!-- Statistics Section -->
+      <div class="mt-16 animate-fade-in-up" style="animation-delay: 0.8s">
+        <AppointmentStatistics />
+      </div>
     </div>
   </div>
 </template>
@@ -190,6 +195,7 @@ import { useDoctorScheduleStore } from '@/stores/DoctorScheduleStore';
 import { useRatingStore } from '@/stores/RatingStore';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import AppointmentStatistics from '@/components/Doctor/AppointmentStatistics.vue';
 
 const router = useRouter();
 

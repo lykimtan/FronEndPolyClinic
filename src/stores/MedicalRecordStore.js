@@ -36,6 +36,11 @@ export const useMedicalRecordStore = defineStore('medicalRecord', {
       }
     },
 
+    // Get medical record by ID (direct method)
+    async getMedicalRecordById(recordId) {
+      return this.fetchMedicalRecordById(recordId);
+    },
+
     // Fetch hồ sơ của một bệnh nhân và lưu vào store
     async fetchRecordsByPatient(patientId) {
       this.isLoading = true;
@@ -88,11 +93,15 @@ export const useMedicalRecordStore = defineStore('medicalRecord', {
     },
 
     // Update hồ sơ y tế
-    async updateMedicalRecord(recordId, updateData) {
+    async updateMedicalRecord(recordId, updateData, doctorId) {
       this.isLoading = true;
       this.error = null;
       try {
-        const response = await MedicalRecordService.updateMedicalRecord(recordId, updateData);
+        const response = await MedicalRecordService.updateMedicalRecord(
+          recordId,
+          updateData,
+          doctorId
+        );
         this.currentRecord = response; // Cập nhật current record
         return response;
       } catch (error) {

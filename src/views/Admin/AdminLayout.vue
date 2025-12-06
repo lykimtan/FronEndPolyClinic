@@ -44,9 +44,4 @@ const getAvatarUrl = avatar => {
   if (avatar.startsWith('http')) return avatar;
   return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}${avatar}`;
 };
-
-function formatDate(dateString) {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date(dateString).toLocaleDateString(undefined, options);
-}
 </script>

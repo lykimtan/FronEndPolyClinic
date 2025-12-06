@@ -193,15 +193,6 @@
               </button>
 
               <button
-                v-if="appointment.status === 'pending'"
-                class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors duration-300 flex items-center gap-2"
-                @click="rejectAppointment(appointment._id)"
-              >
-                <i class="fa-solid fa-x"></i>
-                Từ chối lịch hẹn
-              </button>
-
-              <button
                 class="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-300 flex items-center gap-2"
                 @click="viewDetails(appointment._id)"
               >
@@ -347,22 +338,6 @@ function formatCreatedDate(dateString) {
     hour: '2-digit',
     minute: '2-digit',
   });
-}
-
-async function rejectAppointment(appointmentId) {
-  // Hỏi lý do từ chối (Optional - nâng cao trải nghiệm)
-  const reason = prompt('Nhập lý do từ chối (để trống nếu không cần):');
-  if (reason === null) return; // Nếu user bấm Cancel ở popup
-
-  try {
-    await appointmentStore.updateAppointmentStatus(appointmentId, 'rejected');
-
-    await fetchAppointments();
-    alert('Đã từ chối lịch hẹn.');
-  } catch (error) {
-    console.error('Lỗi khi từ chối lịch:', error);
-    alert('Có lỗi xảy ra khi hủy lịch hẹn.');
-  }
 }
 
 function viewDetails(appointmentId) {

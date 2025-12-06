@@ -184,7 +184,11 @@ const doctorScheduleStore = useDoctorScheduleStore();
 
 const schedules = ref([]);
 
-const today = new Date().toISOString().split('T')[0];
+const date = new Date();
+// Trừ đi offset (ở VN offset là -420 phút, trừ của trừ thành cộng)
+const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+// Lúc này toISOString sẽ ra giờ VN
+const today = localDate.toISOString().split('T')[0];
 const selectedDate = ref(today);
 const router = useRouter();
 
@@ -211,6 +215,8 @@ onMounted(async () => {
 const isSameDate = (date1, date2) => {
   const d1 = new Date(date1);
   const d2 = new Date(date2);
+  d1.setHours(0, 0, 0, 0);
+  d2.setHours(0, 0, 0, 0);
   return (
     d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&

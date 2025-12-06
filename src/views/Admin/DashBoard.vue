@@ -21,7 +21,7 @@
       </div>
     </div>
     <router-link
-      to="/quan-ly-nguoi-dung"
+      to="/admin/user-management"
       class="group block bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700/50 cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-750 hover:border-indigo-500/50 hover:shadow-indigo-500/20 hover:shadow-xl hover:-translate-y-1 active:scale-95"
     >
       <div class="flex flex-col items-center gap-3">
@@ -41,8 +41,11 @@
         </div>
       </div>
     </router-link>
-    <div class="bg-gray-800 rounded-xl p-4 shadow-lg">Card 3</div>
-    <div class="bg-gray-800 rounded-xl p-4 shadow-lg">Card 4</div>
+  </div>
+
+  <!-- Appointment Statistics Section -->
+  <div class="mt-8">
+    <AdminAppointmentStatistics />
   </div>
 </template>
 
@@ -53,6 +56,7 @@ import { useUserStore } from '@/stores/userStore';
 
 //import components
 import RoleCard from '@/components/Admin/RoleCard.vue';
+import AdminAppointmentStatistics from '@/components/Admin/AdminAppointmentStatistics.vue';
 
 const userStore = useUserStore();
 

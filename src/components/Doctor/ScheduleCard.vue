@@ -69,13 +69,19 @@ const formatDate = dateString => {
   });
 };
 
-const getShiftLabel = shiftArray => {
+const getShiftLabel = shift => {
   const shiftLabels = {
     morning: '⭐ Buổi sáng (8:00 - 12:00)',
     afternoon: '☀️ Buổi chiều (13:00 - 17:00)',
     evening: '🌙 Buổi tối (17:00 - 21:00)',
   };
-  return shiftArray.map(shift => shiftLabels[shift] || shift).join(', ');
+
+  // Handle both string and array formats
+  if (Array.isArray(shift)) {
+    return shift.map(s => shiftLabels[s] || s).join(', ');
+  }
+
+  return shiftLabels[shift] || shift;
 };
 
 const isSchedulePast = dateString => {

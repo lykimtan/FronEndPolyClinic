@@ -32,6 +32,11 @@ class AppointmentService {
     return res.data;
   }
 
+  async getAppointmentsByDoctor(doctorId) {
+    const res = await privateApi.get(`${this.baseUrl}/doctor/${doctorId}`);
+    return res.data;
+  }
+
   async getAllAppointmentsByDate(date) {
     const res = await privateApi.get(`${this.baseUrl}/doctor/appointment-today`, {
       params: { date },

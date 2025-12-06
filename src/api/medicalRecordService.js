@@ -39,6 +39,18 @@ class MedicalRecordService {
       throw error.response?.data || error;
     }
   }
+
+  async updateMedicalRecord(recordId, updateData, doctorId) {
+    try {
+      const response = await privateApi.put(
+        `${this.baseUrl}/updateRecord/${recordId}?doctorId=${doctorId}`,
+        updateData
+      );
+      return response.data.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
 }
 
 export default new MedicalRecordService();
