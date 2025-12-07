@@ -133,34 +133,6 @@ const handleGoogleLogin = async idToken => {
   }
 };
 
-onMounted(() => {
-  // Render nút Google
-  /* global google */
-  // Debug: print client id and origin from module context (cannot use import.meta in browser console)
-  try {
-    console.log('GSI client id (from module):', import.meta.env.VITE_GOOGLE_CLIENT_ID);
-
-    console.log('Page origin:', window.location.origin);
-  } catch (e) {
-    console.warn('Unable to read import.meta.env here', e);
-  }
-  if (window.google) {
-    google.accounts.id.initialize({
-      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-      callback: response => {
-        const idToken = response.credential;
-        handleGoogleLogin(idToken);
-      },
-    });
-
-    google.accounts.id.renderButton(document.getElementById('google-btn'), {
-      theme: 'outline',
-      size: 'large',
-      width: 250,
-    });
-  }
-});
-
 const loginSchema = yup.object({
   email: yup.string().email('Email không hợp lệ').required('Vui lòng nhập email'),
   password: yup
@@ -205,12 +177,33 @@ const handleSubmit = async credential => {
 };
 
 onMounted(() => {
+  // Check if user already has email from registration
   if (userStore.email) {
     toast.success('Bạn đã đăng ký tài khoản thành công, ' + userStore.email + '!');
   }
   email.value = userStore.email || '';
+
+  // Animate panel
   setTimeout(() => {
     expanded.value = false;
   }, 100);
+
+  // Render Google button
+  /* global google */
+  if (window.google) {
+    google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      callback: response => {
+        const idToken = response.credential;
+        handleGoogleLogin(idToken);
+      },
+    });
+
+    google.accounts.id.renderButton(document.getElementById('google-btn'), {
+      theme: 'outline',
+      size: 'large',
+      width: 250,
+    });
+  }
 });
 </script>

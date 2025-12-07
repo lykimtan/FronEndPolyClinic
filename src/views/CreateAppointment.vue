@@ -287,7 +287,7 @@ const handleSubmit = async () => {
   } catch (error) {
     console.error('Error creating appointment:', error);
     errorMessage.value = error.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
-    toast.error('Đặt lịch thất bại');
+    toast.error('Bạn đã có lịch khám vào thời gian này. Vui lòng chọn thời gian khác.');
   } finally {
     isSubmitting.value = false;
   }

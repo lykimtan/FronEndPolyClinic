@@ -27,7 +27,7 @@
       <div class="p-4 border-b border-gray-200 flex items-center justify-between">
         <h3 class="text-lg font-bold text-gray-800">Thông báo</h3>
         <button
-          v-if="notificationStore.unreadCount > 0"
+          v-if="storeState.unreadCount > 0"
           class="text-xs text-blue-600 hover:text-blue-800 font-semibold"
           @click="markAllAsRead"
         >
@@ -42,14 +42,14 @@
           <span class="text-gray-600">Đang tải...</span>
         </div>
 
-        <div v-else-if="notificationStore.notifications.length === 0" class="p-8 text-center">
+        <div v-else-if="storeState.notifications.length === 0" class="p-8 text-center">
           <i class="fa-solid fa-inbox text-gray-300 text-4xl mb-2"></i>
           <p class="text-gray-500">Không có thông báo</p>
         </div>
 
         <div v-else>
           <NotificationItem
-            v-for="notification in notificationStore.notifications"
+            v-for="notification in storeState.notifications"
             :key="notification._id"
             :notification="notification"
             @mark-as-read="handleMarkAsRead"
@@ -60,7 +60,7 @@
 
       <!-- Footer -->
       <div
-        v-if="notificationStore.notifications.length > 0"
+        v-if="storeState.notifications.length > 0"
         class="p-4 border-t border-gray-200 text-center"
       >
         <button
@@ -75,7 +75,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 import { useNotificationStore } from '@/stores/NotificationStore';
@@ -83,14 +83,42 @@ import NotificationItem from './NotificationItem.vue';
 import { io } from 'socket.io-client';
 
 const router = useRouter();
-const userStore = useUserStore();
-const notificationStore = useNotificationStore();
+
+// Lazy initialize stores to avoid Pinia errors during route transition
+let userStore = null;
+let notificationStore = null;
+
+const getStores = () => {
+  try {
+    if (!userStore) userStore = useUserStore();
+    if (!notificationStore) notificationStore = useNotificationStore();
+    return { userStore, notificationStore };
+  } catch (e) {
+    console.warn('Stores not ready yet:', e.message);
+    return { userStore: null, notificationStore: null };
+  }
+};
+
+// Export stores as computed for template access
+const storeState = computed(() => {
+  const { notificationStore: nStore } = getStores();
+  return nStore || { unreadCount: 0, notifications: [] };
+});
 
 const isDropdownOpen = ref(false);
 const isLoading = ref(false);
 const socket = ref(null);
 
-const unreadCount = computed(() => notificationStore.unreadCount);
+const unreadCount = computed(() => {
+  try {
+    const { notificationStore: nStore } = getStores();
+    if (!nStore) return 0;
+    return nStore.unreadCount || 0;
+  } catch (e) {
+    console.warn('Notification store not ready yet', e);
+    return 0;
+  }
+});
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
@@ -102,13 +130,18 @@ const toggleDropdown = () => {
 const loadNotifications = async () => {
   try {
     isLoading.value = true;
-    const userInfo = userStore.getUserInfo;
+    const { userStore: uStore, notificationStore: nStore } = getStores();
+    if (!uStore || !nStore) {
+      console.warn('Stores not ready yet');
+      return;
+    }
+    const userInfo = uStore.getUserInfo;
     if (!userInfo || !userInfo.id) {
       console.warn('User not authenticated');
       return;
     }
     const userId = userInfo.id;
-    await notificationStore.fetchNotifications(userId, 1, 10);
+    await nStore.fetchNotifications(userId, 1, 10);
   } catch (err) {
     console.error('Error loading notifications:', err);
   } finally {
@@ -118,13 +151,18 @@ const loadNotifications = async () => {
 
 const markAllAsRead = async () => {
   try {
-    const userInfo = userStore.getUserInfo;
+    const { userStore: uStore, notificationStore: nStore } = getStores();
+    if (!uStore || !nStore) {
+      console.warn('Stores not ready yet');
+      return;
+    }
+    const userInfo = uStore.getUserInfo;
     if (!userInfo || !userInfo.id) {
       console.warn('User not authenticated');
       return;
     }
     const userId = userInfo.id;
-    await notificationStore.markAllAsRead(userId);
+    await nStore.markAllAsRead(userId);
   } catch (err) {
     console.error('Error marking all as read:', err);
   }
@@ -132,7 +170,8 @@ const markAllAsRead = async () => {
 
 const handleMarkAsRead = async notificationId => {
   try {
-    await notificationStore.markAsRead(notificationId);
+    const { notificationStore: nStore } = getStores();
+    await nStore.markAsRead(notificationId);
   } catch (err) {
     console.error('Error marking as read:', err);
   }
@@ -140,7 +179,8 @@ const handleMarkAsRead = async notificationId => {
 
 const handleDelete = async notificationId => {
   try {
-    await notificationStore.deleteNotification(notificationId);
+    const { notificationStore: nStore } = getStores();
+    await nStore.deleteNotification(notificationId);
   } catch (err) {
     console.error('Error deleting notification:', err);
   }
@@ -153,38 +193,49 @@ const viewAllNotifications = () => {
 
 // Socket.io setup
 const initializeSocket = () => {
-  const userInfo = userStore.getUserInfo;
-  if (!userInfo || !userInfo.id) {
-    console.warn('User not authenticated, skipping socket initialization');
-    return;
+  try {
+    const { userStore: uStore, notificationStore: nStore } = getStores();
+    if (!uStore || !nStore) {
+      console.warn('Stores not ready for socket initialization');
+      return;
+    }
+
+    const userInfo = uStore.getUserInfo;
+    if (!userInfo || !userInfo.id) {
+      console.warn('User not authenticated, skipping socket initialization');
+      return;
+    }
+
+    const userId = userInfo.id;
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
+    socket.value = io(apiBaseUrl, {
+      auth: {
+        userId,
+      },
+    });
+
+    socket.value.on('connect', () => {
+      console.log('Socket connected');
+      socket.value.emit('join_user_room', userId);
+    });
+
+    socket.value.on('receive_notification', notification => {
+      console.log('Received notification:', notification);
+      const { notificationStore: nStore2 } = getStores();
+      if (nStore2) nStore2.addNotification(notification);
+    });
+
+    socket.value.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
+
+    socket.value.on('error', error => {
+      console.error('Socket error:', error);
+    });
+  } catch (err) {
+    console.warn('Socket initialization error:', err);
   }
-
-  const userId = userInfo.id;
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-
-  socket.value = io(apiBaseUrl, {
-    auth: {
-      userId,
-    },
-  });
-
-  socket.value.on('connect', () => {
-    console.log('Socket connected');
-    socket.value.emit('join_user_room', userId);
-  });
-
-  socket.value.on('receive_notification', notification => {
-    console.log('Received notification:', notification);
-    notificationStore.addNotification(notification);
-  });
-
-  socket.value.on('disconnect', () => {
-    console.log('Socket disconnected');
-  });
-
-  socket.value.on('error', error => {
-    console.error('Socket error:', error);
-  });
 };
 
 // Close dropdown when clicking outside
@@ -196,14 +247,23 @@ const handleClickOutside = e => {
 
 onMounted(async () => {
   try {
-    const userInfo = userStore.getUserInfo;
+    // Wait for Vue to settle before accessing stores
+    await nextTick();
+
+    const { userStore: uStore, notificationStore: nStore } = getStores();
+    if (!uStore || !nStore) {
+      console.warn('Stores not initialized yet');
+      return;
+    }
+
+    const userInfo = uStore.getUserInfo;
     if (!userInfo || !userInfo.id) {
       console.warn('User not authenticated');
       return;
     }
 
     const userId = userInfo.id;
-    await notificationStore.fetchUnreadCount(userId);
+    await nStore.fetchUnreadCount(userId);
     initializeSocket();
     document.addEventListener('click', handleClickOutside);
   } catch (err) {
