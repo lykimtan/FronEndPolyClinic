@@ -3,7 +3,7 @@
     <div class="max-w-7xl mx-auto">
       <!-- Header Section -->
       <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-2">Today's Appointments</h1>
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">Lịch hẹn hôm nay</h1>
         <p class="text-gray-600">{{ formatDateHeader(today) }}</p>
       </div>
 

@@ -132,29 +132,36 @@ const getAvatarUrl = avatar => {
 
       <!-- Drawer Navigation Items -->
       <div class="flex flex-col p-4 space-y-3">
-        <button
-          class="flex items-center w-full bg-sky-500 text-white font-medium rounded-lg px-4 py-3 hover:bg-sky-600 text-left"
-          @click="closeDrawer"
-        >
-          <i class="fa-solid fa-stethoscope mr-3"></i>
-          Schedule Appointment
-        </button>
+        <router-link :to="`/doctor/today-appointments`">
+          <button
+            class="flex items-center w-full bg-sky-500 text-white font-medium rounded-lg px-4 py-3 hover:bg-sky-600 text-left"
+            @click="closeDrawer"
+          >
+            <i class="fa-solid fa-stethoscope mr-3"></i>
+            Lịch hẹn hôm nay
+          </button>
+        </router-link>
 
-        <button
-          class="flex items-center w-full bg-sky-500 text-white font-medium rounded-lg px-4 py-3 hover:bg-sky-600 transition text-left"
-          @click="closeDrawer"
-        >
-          <i class="fa-regular fa-clock mr-3"></i>
-          My Appointment
-        </button>
+        <router-link :to="`/doctor/all-appointments`">
+          <button
+            class="flex items-center w-full bg-sky-500 text-white font-medium rounded-lg px-4 py-3 hover:bg-sky-600 transition text-left"
+            @click="closeDrawer"
+          >
+            <i class="fa-regular fa-clock mr-3"></i>
+            Danh mục lịch hẹn
+          </button>
+        </router-link>
 
-        <button
-          class="flex items-center w-full bg-sky-500 text-white font-medium rounded-lg px-4 py-3 hover:bg-sky-600 transition text-left"
-          @click="closeDrawer"
-        >
-          <i class="fa-solid fa-notes-medical mr-3"></i>
-          Medical Record
-        </button>
+        <router-link :to="`/doctor/my-work-schedule`">
+          <button
+            class="flex items-center w-full bg-sky-500 text-white font-medium rounded-lg px-4 py-3 hover:bg-sky-600 transition text-left"
+            @click="closeDrawer"
+          >
+            <i class="fa-solid fa-notes-medical mr-3"></i>
+            Lịch làm việc của tôi
+          </button>
+        </router-link>
+
         <router-link to="/userProfile">
           <button
             class="flex items-center w-full bg-sky-500 text-white font-medium rounded-lg px-4 py-3 hover:bg-sky-600 transition text-left"

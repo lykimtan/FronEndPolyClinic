@@ -27,7 +27,7 @@
 
       <!-- Right panel -->
       <div class="relative z-0 flex flex-col justify-center items-center p-10 space-y-4 md:w-1/2">
-        <h2 class="text-3xl font-bold mb-4 text-gray-800">Login</h2>
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">Đăng nhập</h2>
 
         <Form
           class="w-full max-w-sm space-y-4"
